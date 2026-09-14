@@ -30,7 +30,7 @@ const cols = [
   <div class="container">
     <div class="top">
       <div class="brand">
-        <span class="logo-text">Tech<span>Pulse</span></span>
+        <img class="logo-mark" src="/news.png" alt="TechPulse" width="66" height="44" />
         <p>
           Independent coverage of technology and the wider world. Built with Astro —
           fast, static and open.
@@ -70,12 +70,10 @@ const cols = [
     grid-template-columns: 1.6fr repeat(3, 1fr);
     gap: 32px;
   }
-  .brand .logo-text {
-    font-weight: 800;
-    font-size: 1.15rem;
-  }
-  .brand .logo-text span {
-    color: var(--accent);
+  .brand .logo-mark {
+    height: 44px;
+    width: auto;
+    display: block;
   }
   .brand p {
     margin-top: 10px;

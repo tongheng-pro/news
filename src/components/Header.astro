@@ -11,8 +11,7 @@ const { current } = Astro.props;
 <header class="site-header">
   <div class="container bar">
     <a href="/" class="logo" aria-label="TechPulse home">
-      <span class="logo-mark" aria-hidden="true"></span>
-      <span class="logo-text">Tech<span>Pulse</span></span>
+      <img class="logo-mark" src="/news.png" alt="TechPulse" width="77" height="52" />
     </a>
 
     <div class="nav-desktop">
@@ -52,7 +51,7 @@ const { current } = Astro.props;
 <div class="mobile-drawer" id="mobile-drawer" hidden>
   <div class="drawer-panel">
     <div class="drawer-head">
-      <span class="logo-text">Tech<span>Pulse</span></span>
+      <img class="logo-mark" src="/news.png" alt="TechPulse" width="77" height="52" />
       <button type="button" class="icon-btn" id="drawer-close" aria-label="Close menu">
         <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <path d="M6 6l12 12M18 6 6 18" />
@@ -86,21 +85,10 @@ const { current } = Astro.props;
     flex-shrink: 0;
   }
   .logo-mark {
-    width: 22px;
-    height: 22px;
-    border-radius: 7px;
-    background: conic-gradient(from 210deg, var(--accent), #7c4dff, #00c2a8, var(--accent));
-    box-shadow: var(--shadow-sm);
+    height: 52px;
+    width: auto;
+    display: block;
   }
-  .logo-text {
-    font-weight: 800;
-    font-size: 1.2rem;
-    letter-spacing: -0.03em;
-  }
-  .logo-text span {
-    color: var(--accent);
-  }
-
   .nav-desktop {
     flex: 1;
     min-width: 0;
