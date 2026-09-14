@@ -1,0 +1,34 @@
+---
+import type { Article } from '../types/news';
+import NewsCard from './NewsCard.astro';
+
+export interface Props {
+  articles: Article[];
+  title?: string;
+  columns?: 2 | 3 | 4;
+}
+const { articles, title = 'Related stories', columns = 3 } = Astro.props;
+---
+
+{
+  articles.length > 0 && (
+    <section class="section related">
+      <div class="section-head">
+        <h2>{title}</h2>
+      </div>
+      <div class:list={['grid', `grid-${columns}`]}>
+        {articles.map((a) => (
+          <NewsCard article={a} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .related {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+</style>

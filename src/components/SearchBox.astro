@@ -1,0 +1,61 @@
+---
+export interface Props {
+  value?: string;
+  autofocus?: boolean;
+}
+const { value = '', autofocus = false } = Astro.props;
+---
+
+<form class="searchbox" role="search" action="/search" method="get">
+  <svg class="s-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+    <circle cx="11" cy="11" r="7" />
+    <path d="m20 20-3.5-3.5" />
+  </svg>
+  <input
+    type="search"
+    name="q"
+    id="search-input"
+    placeholder="Search technology news…"
+    aria-label="Search technology news"
+    value={value}
+    autocomplete="off"
+    autofocus={autofocus}
+  />
+  <button type="submit" class="btn btn-primary">Search</button>
+</form>
+
+<style>
+  .searchbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 8px 8px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow-sm);
+  }
+  .searchbox:focus-within {
+    border-color: var(--accent);
+  }
+  .s-icon {
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .searchbox input {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 8px 0;
+    font-size: 1.05rem;
+    min-width: 0;
+  }
+  .searchbox input:focus {
+    outline: none;
+  }
+  @media (max-width: 520px) {
+    .searchbox .btn {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,36 @@
+---
+/**
+ * Lazy, responsive image with a graceful fallback.
+ * - The wrapper always shows a gradient, so a missing/slow image never blanks.
+ * - `onerror` swaps a broken remote image for a deterministic gradient.
+ */
+import { gradientPlaceholder } from '../lib/news/normalize';
+
+export interface Props {
+  src: string;
+  alt: string;
+  seed: string;
+  /** Above-the-fold hero images should pass eager. */
+  eager?: boolean;
+  sizes?: string;
+  class?: string;
+}
+
+const { src, alt, seed, eager = false, sizes = '(max-width: 620px) 100vw, 33vw', class: cls = '' } = Astro.props;
+const fallback = gradientPlaceholder(seed);
+---
+
+<div class:list={['img-frame', cls]}>
+  <img
+    src={src}
+    alt={alt}
+    loading={eager ? 'eager' : 'lazy'}
+    decoding="async"
+    fetchpriority={eager ? 'high' : 'auto'}
+    sizes={sizes}
+    data-loaded="false"
+    data-fallback={fallback}
+    onload="this.dataset.loaded='true'"
+    onerror="if(this.src!==this.dataset.fallback){this.src=this.dataset.fallback;this.dataset.loaded='true';}"
+  />
+</div>

@@ -1,0 +1,204 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import ArticleHeader from '../../components/ArticleHeader.astro';
+import ArticleContent from '../../components/ArticleContent.astro';
+import ShareButtons from '../../components/ShareButtons.astro';
+import ReadingProgress from '../../components/ReadingProgress.astro';
+import RelatedArticles from '../../components/RelatedArticles.astro';
+import TrendingList from '../../components/TrendingList.astro';
+import { categorySlug } from '../../types/news';
+import {
+  getNews,
+  getNewsBySlug,
+  getRelatedNews,
+  getMoreFromCategory,
+  getTrendingNews,
+} from '../../lib/news';
+import { formatDate } from '../../lib/format';
+
+export async function getStaticPaths() {
+  const articles = await getNews();
+  return articles.map((article) => ({ params: { slug: article.slug } }));
+}
+
+const { slug } = Astro.params;
+const article = await getNewsBySlug(slug!);
+if (!article) return Astro.redirect('/404');
+
+const [related, more, trending] = await Promise.all([
+  getRelatedNews(article, 3),
+  getMoreFromCategory(article, 4),
+  getTrendingNews(5),
+]);
+
+const path = `/news/${article.slug}`;
+const site = Astro.site ?? new URL('http://localhost:4321');
+
+// NewsArticle structured data.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'NewsArticle',
+  headline: article.title,
+  description: article.excerpt,
+  image: [article.image],
+  datePublished: article.publishedAt,
+  dateModified: article.updatedAt,
+  author: [{ '@type': 'Person', name: article.author }],
+  publisher: {
+    '@type': 'Organization',
+    name: 'TechPulse',
+    logo: { '@type': 'ImageObject', url: new URL('/og-default.svg', site).toString() },
+  },
+  mainEntityOfPage: { '@type': 'WebPage', '@id': new URL(path, site).toString() },
+  articleSection: article.category,
+  keywords: article.tags.join(', '),
+};
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: site.toString() },
+    {
+      '@type': 'ListItem',
+      position: 2,
+      name: article.category,
+      item: new URL(`/category/${categorySlug(article.category)}`, site).toString(),
+    },
+    { '@type': 'ListItem', position: 3, name: article.title, item: new URL(path, site).toString() },
+  ],
+};
+---
+
+<Layout
+  title={article.title}
+  description={article.excerpt}
+  canonical={path}
+  image={article.image}
+  type="article"
+  publishedTime={article.publishedAt}
+  modifiedTime={article.updatedAt}
+  author={article.author}
+  section={article.category}
+  tags={article.tags}
+  jsonLd={[jsonLd, breadcrumbLd]}
+  wrapMain={false}
+>
+  <ReadingProgress />
+  <main id="main" class="article-page">
+    <div class="container">
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: article.category, href: `/category/${categorySlug(article.category)}` },
+          { label: article.title },
+        ]}
+      />
+
+      <div class="layout">
+        <article class="article">
+          <ArticleHeader article={article} />
+
+          <div class="share-row">
+            <ShareButtons title={article.title} path={path} />
+          </div>
+
+          <ArticleContent article={article} />
+
+          <div class="share-row share-row--bottom">
+            <ShareButtons title={article.title} path={path} />
+          </div>
+
+          <RelatedArticles articles={more} title={`More from ${article.category}`} columns={4} />
+        </article>
+
+        <aside class="article-aside">
+          <div class="aside-sticky">
+            <TrendingList articles={trending} title="Trending" />
+            <div class="aside-card">
+              <p class="eyebrow">About this story</p>
+              <dl>
+                <div><dt>Source</dt><dd>{article.source}</dd></div>
+                <div><dt>Author</dt><dd>{article.author}</dd></div>
+                <div><dt>Published</dt><dd>{formatDate(article.publishedAt)}</dd></div>
+                <div><dt>Section</dt><dd>{article.category}</dd></div>
+              </dl>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <RelatedArticles articles={related} title="Related stories" columns={3} />
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .article-page {
+    padding-block: 24px 48px;
+  }
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: clamp(28px, 5vw, 56px);
+    align-items: start;
+    margin-top: 20px;
+  }
+  .article {
+    max-width: 760px;
+  }
+  .share-row {
+    margin: 24px 0;
+    padding: 16px 0;
+    border-block: 1px solid var(--border);
+  }
+  .share-row--bottom {
+    margin-top: 32px;
+  }
+  .aside-sticky {
+    position: sticky;
+    top: calc(var(--header-height) + 20px);
+    display: grid;
+    gap: 24px;
+  }
+  .aside-card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    background: var(--surface);
+  }
+  .aside-card dl {
+    margin-top: 12px;
+    display: grid;
+    gap: 10px;
+  }
+  .aside-card dl > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.86rem;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .aside-card dl > div:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .aside-card dt {
+    color: var(--text-muted);
+  }
+  .aside-card dd {
+    margin: 0;
+    font-weight: 600;
+    text-align: right;
+  }
+  @media (max-width: 1000px) {
+    .layout {
+      grid-template-columns: 1fr;
+    }
+    .article-aside {
+      display: none;
+    }
+  }
+</style>

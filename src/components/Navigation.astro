@@ -1,0 +1,78 @@
+---
+import { CATEGORIES } from '../types/news';
+
+export interface Props {
+  /** e.g. "/category/ai" or "/trending" — highlights the active link. */
+  current?: string;
+  id?: string;
+  className?: string;
+}
+
+const { current = '', id, className = '' } = Astro.props;
+
+const links = [
+  ...CATEGORIES.map((c) => ({ href: `/category/${c.slug}`, label: c.name })),
+  { href: '/trending', label: 'Trending' },
+];
+---
+
+<nav class:list={['site-nav', className]} id={id} aria-label="Sections">
+  <ul>
+    {
+      links.map((l) => (
+        <li>
+          <a
+            href={l.href}
+            aria-current={current === l.href ? 'page' : undefined}
+            class:list={['nav-link', { active: current === l.href }]}
+          >
+            {l.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  .site-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-wrap: wrap;
+  }
+  .nav-link {
+    display: inline-block;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--text-muted);
+    white-space: nowrap;
+    transition: color 0.15s var(--ease), background-color 0.15s var(--ease);
+  }
+  .nav-link:hover {
+    color: var(--text);
+    background: var(--surface-hover);
+  }
+  .nav-link.active {
+    color: var(--accent);
+  }
+
+  /* Mobile drawer variant */
+  .site-nav.drawer ul {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+  }
+  .site-nav.drawer .nav-link {
+    padding: 14px 12px;
+    font-size: 1rem;
+    border-bottom: 1px solid var(--border);
+    border-radius: 0;
+  }
+</style>

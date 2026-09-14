@@ -1,0 +1,176 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import CategoryHeader from '../../components/CategoryHeader.astro';
+import FeaturedArticle from '../../components/FeaturedArticle.astro';
+import NewsCard from '../../components/NewsCard.astro';
+import NewsGrid from '../../components/NewsGrid.astro';
+import TrendingList from '../../components/TrendingList.astro';
+import Newsletter from '../../components/Newsletter.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import { CATEGORIES } from '../../types/news';
+import { getNewsByCategory, getTrendingNews } from '../../lib/news';
+
+const PAGE_SIZE = 12;
+
+export async function getStaticPaths() {
+  return CATEGORIES.map((c) => ({ params: { category: c.slug } }));
+}
+
+const { category } = Astro.params;
+const meta = CATEGORIES.find((c) => c.slug === category)!;
+
+const all = await getNewsByCategory(meta.slug, { pageSize: 500 });
+const trendingInCat = [...all.items]
+  .filter((a) => a.trending)
+  .slice(0, 5);
+const trending = trendingInCat.length >= 3 ? trendingInCat : await getTrendingNews(5);
+
+const featured = all.items[0];
+const rest = all.items.slice(1);
+const firstPage = rest.slice(0, PAGE_SIZE);
+const remaining = rest.slice(PAGE_SIZE);
+---
+
+<Layout
+  title={`${meta.name} news`}
+  description={meta.description}
+  canonical={`/category/${meta.slug}`}
+>
+  <CategoryHeader name={meta.name} description={meta.description} count={all.total} />
+
+  <div class="container" style="padding-top:20px">
+    <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: meta.name }]} />
+  </div>
+
+  <section class="section">
+    <div class="container cat-layout">
+      <div class="cat-main">
+        {featured && (
+          <div class="cat-featured">
+            <p class="eyebrow" style="margin-bottom:14px">Featured</p>
+            <FeaturedArticle article={featured} />
+          </div>
+        )}
+
+        <div class="section-head" style="margin-top:40px">
+          <h2>Latest {meta.name} news</h2>
+        </div>
+
+        <NewsGrid articles={firstPage} columns={3} />
+
+        {remaining.length > 0 && (
+          <>
+            <div class="grid grid-3 more-grid" id="more-grid" hidden>
+              {remaining.map((a) => <NewsCard article={a} />)}
+            </div>
+            <div class="load-more-wrap">
+              <button type="button" class="btn btn-primary" id="load-more">
+                Load {remaining.length} more {remaining.length === 1 ? 'story' : 'stories'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+
+      <aside class="cat-aside">
+        <div class="aside-sticky">
+          <TrendingList articles={trending} title="Trending" />
+          <div class="aside-nav">
+            <p class="eyebrow">Browse sections</p>
+            <ul>
+              {CATEGORIES.map((c) => (
+                <li>
+                  <a href={`/category/${c.slug}`} aria-current={c.slug === meta.slug ? 'page' : undefined}>
+                    {c.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <Newsletter />
+</Layout>
+
+<style>
+  .cat-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: clamp(28px, 5vw, 56px);
+    align-items: start;
+  }
+  .load-more-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+  }
+  .more-grid[hidden] {
+    display: none;
+  }
+  .more-grid {
+    margin-top: 24px;
+  }
+  .aside-sticky {
+    position: sticky;
+    top: calc(var(--header-height) + 20px);
+    display: grid;
+    gap: 24px;
+  }
+  .aside-nav {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px;
+    background: var(--surface);
+  }
+  .aside-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    display: grid;
+    gap: 4px;
+  }
+  .aside-nav a {
+    display: block;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+  .aside-nav a:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+  .aside-nav a[aria-current='page'] {
+    color: var(--accent);
+    background: var(--surface-2);
+  }
+  @media (max-width: 1000px) {
+    .cat-layout {
+      grid-template-columns: 1fr;
+    }
+    .cat-aside {
+      order: -1;
+    }
+    .aside-sticky {
+      position: static;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var btn = document.getElementById('load-more');
+    var grid = document.getElementById('more-grid');
+    if (!btn || !grid) return;
+    btn.addEventListener('click', function () {
+      grid.hidden = false;
+      btn.remove();
+      var first = grid.querySelector('a');
+      if (first) first.focus();
+    });
+  })();
+</script>

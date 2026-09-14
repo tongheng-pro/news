@@ -1,0 +1,167 @@
+---
+import Layout from '../layouts/Layout.astro';
+import NewsCard from '../components/NewsCard.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Newsletter from '../components/Newsletter.astro';
+import { getNews, getTrendingNews } from '../lib/news';
+import { trendingScore } from '../lib/news/normalize';
+import { timeAgo } from '../lib/format';
+
+const all = await getNews();
+const now = Date.now();
+
+// Ranked "trending" — the editorial + recency score.
+const ranked = await getTrendingNews(12);
+
+// Derived leaderboards. In production these read real analytics
+// (views, comments, share velocity). Here they are deterministic proxies.
+const mostViewed = [...all]
+  .sort((a, b) => (b.readingTime * 40 + b.tags.length) - (a.readingTime * 40 + a.tags.length))
+  .slice(0, 6);
+
+const mostDiscussed = [...all]
+  .filter((a) => a.category === 'AI' || a.category === 'Cybersecurity' || a.trending)
+  .slice(0, 6);
+
+const fastRising = [...all]
+  .filter((a) => now - new Date(a.publishedAt).getTime() < 5 * 86_400_000)
+  .sort((a, b) => trendingScore(b, now) - trendingScore(a, now))
+  .slice(0, 6);
+---
+
+<Layout
+  title="Trending"
+  description="The technology stories climbing fastest right now — most viewed, most discussed and fast-rising across TechPulse."
+  canonical="/trending"
+>
+  <section class="section">
+    <div class="container">
+      <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Trending' }]} />
+      <header class="t-hero">
+        <p class="eyebrow">Live ranking</p>
+        <h1>Trending now</h1>
+        <p class="lede">
+          What the world is reading on TechPulse, ranked by a blend of recency and
+          engagement. Updated continuously.
+        </p>
+      </header>
+
+      <ol class="leaderboard">
+        {
+          ranked.map((a, i) => (
+            <li>
+              <span class="rank">{String(i + 1).padStart(2, '0')}</span>
+              <div class="lb-body">
+                <a href={`/news/${a.slug}`}>{a.title}</a>
+                <div class="lb-meta">
+                  <span class="lb-cat">{a.category}</span>
+                  <span class="dot" aria-hidden="true">·</span>
+                  <span>{a.source}</span>
+                  <span class="dot" aria-hidden="true">·</span>
+                  <time datetime={a.publishedAt}>{timeAgo(a.publishedAt)}</time>
+                </div>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container boards">
+      <div>
+        <div class="section-head"><h2>Most viewed</h2></div>
+        <div class="board-list">
+          {mostViewed.map((a) => <NewsCard article={a} variant="compact" />)}
+        </div>
+      </div>
+      <div>
+        <div class="section-head"><h2>Most discussed</h2></div>
+        <div class="board-list">
+          {mostDiscussed.map((a) => <NewsCard article={a} variant="compact" />)}
+        </div>
+      </div>
+      <div>
+        <div class="section-head"><h2>Fast rising</h2></div>
+        <div class="board-list">
+          {fastRising.map((a) => <NewsCard article={a} variant="compact" />)}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <Newsletter />
+</Layout>
+
+<style>
+  .t-hero {
+    margin: 20px 0 32px;
+  }
+  .t-hero h1 {
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    margin: 8px 0 12px;
+  }
+  .t-hero .lede {
+    color: var(--text-muted);
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    max-width: 56ch;
+  }
+  .leaderboard {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 2px solid var(--text);
+  }
+  .leaderboard li {
+    display: flex;
+    gap: clamp(14px, 3vw, 32px);
+    align-items: center;
+    padding: clamp(16px, 2.4vw, 24px) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .leaderboard .rank {
+    font-size: clamp(1.4rem, 3.5vw, 2.4rem);
+    font-weight: 800;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    min-width: 2.2ch;
+  }
+  .lb-body a {
+    font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+    font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+  }
+  .lb-body a:hover {
+    color: var(--accent);
+  }
+  .lb-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+  .lb-cat {
+    color: var(--accent);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .boards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(24px, 4vw, 44px);
+  }
+  .board-list :global(.card--compact:last-child) {
+    border-bottom: none;
+  }
+  @media (max-width: 900px) {
+    .boards {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

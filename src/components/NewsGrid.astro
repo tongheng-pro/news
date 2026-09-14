@@ -1,0 +1,21 @@
+---
+import type { Article } from '../types/news';
+import NewsCard from './NewsCard.astro';
+
+export interface Props {
+  articles: Article[];
+  columns?: 2 | 3 | 4;
+  variant?: 'default' | 'wide' | 'compact';
+  eagerFirst?: boolean;
+}
+
+const { articles, columns = 3, variant = 'default', eagerFirst = false } = Astro.props;
+---
+
+<div class:list={['grid', `grid-${columns}`]}>
+  {
+    articles.map((article, i) => (
+      <NewsCard article={article} variant={variant} eager={eagerFirst && i === 0} />
+    ))
+  }
+</div>

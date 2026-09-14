@@ -1,0 +1,27 @@
+---
+import type { Article, Category } from '../types/news';
+import { categorySlug } from '../types/news';
+import NewsGrid from './NewsGrid.astro';
+
+export interface Props {
+  category: Category;
+  articles: Article[];
+  columns?: 2 | 3 | 4;
+}
+const { category, articles, columns = 4 } = Astro.props;
+const slug = categorySlug(category);
+---
+
+{
+  articles.length > 0 && (
+    <section class="section cat-section">
+      <div class="container">
+        <div class="section-head">
+          <h2>{category}</h2>
+          <a href={`/category/${slug}`}>View all {category} news →</a>
+        </div>
+        <NewsGrid articles={articles} columns={columns} />
+      </div>
+    </section>
+  )
+}

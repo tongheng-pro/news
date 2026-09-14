@@ -1,0 +1,129 @@
+---
+import { CATEGORIES } from '../types/news';
+
+const year = new Date().getFullYear();
+const cols = [
+  {
+    title: 'Sections',
+    links: CATEGORIES.slice(0, 6).map((c) => ({ href: `/category/${c.slug}`, label: c.name })),
+  },
+  {
+    title: 'More',
+    links: [
+      ...CATEGORIES.slice(6).map((c) => ({ href: `/category/${c.slug}`, label: c.name })),
+      { href: '/trending', label: 'Trending' },
+    ],
+  },
+  {
+    title: 'TechPulse',
+    links: [
+      { href: '/search', label: 'Search' },
+      { href: '/trending', label: 'Most read' },
+      { href: '/sitemap.xml', label: 'Sitemap' },
+      { href: '/rss.xml', label: 'RSS feed' },
+    ],
+  },
+];
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="top">
+      <div class="brand">
+        <span class="logo-text">Tech<span>Pulse</span></span>
+        <p>
+          Independent coverage of technology and the wider world. Built with Astro —
+          fast, static and open.
+        </p>
+      </div>
+      {
+        cols.map((col) => (
+          <nav class="col" aria-label={col.title}>
+            <h3>{col.title}</h3>
+            <ul>
+              {col.links.map((l) => (
+                <li>
+                  <a href={l.href}>{l.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))
+      }
+    </div>
+    <div class="bottom">
+      <p>© {year} TechPulse. Mock content for demonstration — no article here is real.</p>
+      <p class="muted">Made with Astro · No trackers · No cookies</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 64px;
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+    padding-block: 48px 28px;
+  }
+  .top {
+    display: grid;
+    grid-template-columns: 1.6fr repeat(3, 1fr);
+    gap: 32px;
+  }
+  .brand .logo-text {
+    font-weight: 800;
+    font-size: 1.15rem;
+  }
+  .brand .logo-text span {
+    color: var(--accent);
+  }
+  .brand p {
+    margin-top: 10px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    max-width: 34ch;
+  }
+  .col h3 {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .col a {
+    font-size: 0.9rem;
+    color: var(--text);
+  }
+  .col a:hover {
+    color: var(--accent);
+  }
+  .bottom {
+    margin-top: 36px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  @media (max-width: 860px) {
+    .top {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 520px) {
+    .top {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+  }
+</style>

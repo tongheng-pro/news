@@ -1,0 +1,22 @@
+{
+  "name": "news",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "refresh": "astro build",
+    "refresh:loop": "node scripts/refresh-loop.mjs",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^7.2.8"
+  },
+  "allowScripts": {
+    "esbuild": true
+  }
+}

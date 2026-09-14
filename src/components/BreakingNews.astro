@@ -1,0 +1,141 @@
+---
+import type { Article } from '../types/news';
+import { timeAgo } from '../lib/format';
+
+export interface Props {
+  articles: Article[];
+}
+const { articles } = Astro.props;
+---
+
+{
+  articles.length > 0 && (
+    <aside class="breaking" aria-label="Breaking news">
+      <div class="container inner">
+        <span class="badge">
+          <span class="pulse" aria-hidden="true" />
+          Breaking
+        </span>
+        <div class="ticker" tabindex="0">
+          <ul>
+            {articles.map((a) => (
+              <li>
+                <a href={`/news/${a.slug}`}>
+                  {a.title}
+                  <span class="ago">{timeAgo(a.publishedAt)}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </aside>
+  )
+}
+
+<style>
+  .breaking {
+    background: var(--text);
+    color: var(--background);
+  }
+  :global(:root[data-theme='dark']) .breaking {
+    background: #1b0f12;
+    color: #fff;
+  }
+  .inner {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 46px;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    font-size: 0.74rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--danger);
+  }
+  .pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--danger);
+    box-shadow: 0 0 0 0 var(--danger);
+    animation: pulse 1.8s infinite;
+  }
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger) 70%, transparent);
+    }
+    70% {
+      box-shadow: 0 0 0 8px transparent;
+    }
+    100% {
+      box-shadow: 0 0 0 0 transparent;
+    }
+  }
+  .ticker {
+    overflow: hidden;
+    flex: 1;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px, #000 92%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 24px, #000 92%, transparent);
+  }
+  .ticker ul {
+    list-style: none;
+    display: flex;
+    gap: 48px;
+    padding: 0;
+    margin: 0;
+    width: max-content;
+    animation: scroll 42s linear infinite;
+  }
+  .ticker:hover ul,
+  .ticker:focus-within ul {
+    animation-play-state: paused;
+  }
+  .ticker a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .ticker a:hover {
+    text-decoration: underline;
+  }
+  .ago {
+    font-size: 0.72rem;
+    font-weight: 500;
+    opacity: 0.6;
+  }
+  @keyframes scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ticker ul {
+      animation: none;
+      overflow-x: auto;
+    }
+  }
+</style>
+
+<script is:inline>
+  /* Duplicate the ticker items once so the marquee loops seamlessly. */
+  (function () {
+    var list = document.querySelector('.breaking .ticker ul');
+    if (list && !list.dataset.cloned) {
+      list.innerHTML += list.innerHTML;
+      list.dataset.cloned = '1';
+    }
+  })();
+</script>

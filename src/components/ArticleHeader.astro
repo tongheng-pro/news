@@ -1,0 +1,120 @@
+---
+import type { Article } from '../types/news';
+import { categorySlug } from '../types/news';
+import { formatDate, formatDateTime, readingTimeLabel } from '../lib/format';
+import NewsImage from './NewsImage.astro';
+
+export interface Props {
+  article: Article;
+}
+const { article } = Astro.props;
+const wasUpdated =
+  new Date(article.updatedAt).getTime() - new Date(article.publishedAt).getTime() > 60_000;
+const sameAuthorAsSource =
+  article.author.trim().toLowerCase() === article.source.trim().toLowerCase();
+---
+
+<header class="article-head">
+  <p class="eyebrow">
+    <a href={`/category/${categorySlug(article.category)}`}>{article.category}</a>
+  </p>
+  <h1>{article.title}</h1>
+  <p class="subtitle">{article.excerpt}</p>
+
+  <div class="byline">
+    <div class="avatar" aria-hidden="true">{article.author.slice(0, 1)}</div>
+    <div class="byline-text">
+      <p class="by">
+        {sameAuthorAsSource ? (
+          <>Via <strong>{article.source}</strong></>
+        ) : (
+          <>By <strong>{article.author}</strong> · {article.source}</>
+        )}
+      </p>
+      <p class="dates">
+        <time datetime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
+        {wasUpdated && (
+          <>
+            <span class="dot" aria-hidden="true">·</span>
+            <span>Updated <time datetime={article.updatedAt}>{formatDateTime(article.updatedAt)}</time></span>
+          </>
+        )}
+        <span class="dot" aria-hidden="true">·</span>
+        <span>{readingTimeLabel(article.readingTime)}</span>
+      </p>
+    </div>
+  </div>
+
+  <figure class="hero">
+    <NewsImage
+      src={article.image}
+      alt={article.title}
+      seed={article.slug}
+      eager
+      sizes="(max-width: 900px) 100vw, 820px"
+    />
+    <figcaption>
+      {article.isMock
+        ? `Illustration · ${article.source}. Mock image for demonstration.`
+        : `Photo · ${article.source}`}
+    </figcaption>
+  </figure>
+</header>
+
+<style>
+  .article-head {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  h1 {
+    font-size: clamp(1.9rem, 4.6vw, 3.1rem);
+    line-height: 1.1;
+  }
+  .subtitle {
+    font-size: clamp(1.05rem, 2vw, 1.3rem);
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .byline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-block: 8px;
+  }
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    color: var(--accent-contrast);
+    background: var(--accent);
+    text-transform: uppercase;
+  }
+  .by {
+    font-size: 0.9rem;
+  }
+  .dates {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+  .hero {
+    margin: 12px 0 0;
+  }
+  .hero :global(.img-frame) {
+    border-radius: var(--radius);
+    aspect-ratio: 16 / 9;
+  }
+  .hero figcaption {
+    margin-top: 8px;
+    font-size: 0.76rem;
+    color: var(--text-muted);
+  }
+</style>

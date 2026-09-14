@@ -1,0 +1,52 @@
+---
+import Layout from '../layouts/Layout.astro';
+import NewsGrid from '../components/NewsGrid.astro';
+import { getNews } from '../lib/news';
+
+const latest = await getNews(4);
+---
+
+<Layout title="Page not found" description="The page you were looking for does not exist." noindex>
+  <section class="section">
+    <div class="container nf">
+      <p class="eyebrow">Error 404</p>
+      <h1>We couldn't find that page</h1>
+      <p class="lede">
+        The link may be broken or the story may have been moved. Try searching, or
+        pick up one of the latest headlines below.
+      </p>
+      <div class="nf-actions">
+        <a href="/" class="btn btn-primary">Back to home</a>
+        <a href="/search" class="btn">Search news</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="section-head"><h2>Latest news</h2></div>
+      <NewsGrid articles={latest} columns={4} />
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .nf {
+    max-width: 640px;
+    padding-block: 32px;
+  }
+  .nf h1 {
+    font-size: clamp(2rem, 6vw, 3.4rem);
+    margin: 10px 0 14px;
+  }
+  .nf .lede {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+  }
+  .nf-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+</style>

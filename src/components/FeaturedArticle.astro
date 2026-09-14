@@ -1,0 +1,118 @@
+---
+import type { Article } from '../types/news';
+import { categorySlug } from '../types/news';
+import { formatDate, readingTimeLabel } from '../lib/format';
+import NewsImage from './NewsImage.astro';
+
+export interface Props {
+  article: Article;
+}
+const { article } = Astro.props;
+const href = `/news/${article.slug}`;
+---
+
+<article class="featured">
+  <a href={href} class="featured-media" tabindex="-1" aria-hidden="true">
+    <NewsImage
+      src={article.image}
+      alt={article.title}
+      seed={article.slug}
+      eager
+      sizes="(max-width: 900px) 100vw, 60vw"
+    />
+  </a>
+  <div class="featured-body">
+    <div class="featured-meta">
+      <a href={`/category/${categorySlug(article.category)}`} class="eyebrow">{article.category}</a>
+    </div>
+    <h2 class="featured-title">
+      <a href={href}>{article.title}</a>
+    </h2>
+    <p class="featured-excerpt">{article.excerpt}</p>
+    <div class="featured-foot">
+      <span>
+        {article.author.trim().toLowerCase() === article.source.trim().toLowerCase()
+          ? article.source
+          : `By ${article.author}, ${article.source}`}
+      </span>
+      <span class="dot" aria-hidden="true">·</span>
+      <time datetime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
+      <span class="dot" aria-hidden="true">·</span>
+      <span>{readingTimeLabel(article.readingTime)}</span>
+    </div>
+  </div>
+</article>
+
+<style>
+  .featured {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: clamp(20px, 3vw, 40px);
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .featured-media {
+    display: block;
+    /* Without this, the grid item's default auto min-width lets the image
+       frame's intrinsic size push it past its 1.5fr track and crush the
+       text column next to it. */
+    min-width: 0;
+  }
+  .featured-media :global(.img-frame) {
+    /* Width is pinned to the column; height is left to `aspect-ratio` below
+       so the frame's shape always stays 16:10 — NOT `align-self: stretch` +
+       `height: 100%`, which used to make the row's own height (driven by
+       whatever the headline needs) dictate the image's height instead,
+       stretching it tall and out of proportion behind long titles. */
+    width: 100%;
+    aspect-ratio: 16 / 10;
+  }
+  .featured:hover :global(.img-frame img) {
+    transform: scale(1.04);
+  }
+  .featured-body {
+    padding: clamp(20px, 3vw, 40px);
+    padding-left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .featured-title {
+    font-size: clamp(1.6rem, 3.4vw, 2.6rem);
+    line-height: 1.12;
+  }
+  .featured-title a:hover {
+    color: var(--accent);
+  }
+  .featured-title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .featured-excerpt {
+    font-size: clamp(1rem, 1.6vw, 1.15rem);
+    color: var(--text-muted);
+    max-width: 52ch;
+  }
+  .featured-foot {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+  @media (max-width: 900px) {
+    .featured {
+      grid-template-columns: 1fr;
+    }
+    .featured-body {
+      padding: clamp(18px, 5vw, 28px);
+      padding-top: 0;
+    }
+  }
+</style>

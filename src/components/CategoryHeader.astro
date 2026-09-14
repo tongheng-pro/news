@@ -1,0 +1,42 @@
+---
+export interface Props {
+  name: string;
+  description: string;
+  count: number;
+}
+const { name, description, count } = Astro.props;
+---
+
+<header class="cat-header">
+  <div class="container">
+    <p class="eyebrow">Section</p>
+    <h1>{name} news</h1>
+    <p class="lede">{description}</p>
+    <p class="count">{count} {count === 1 ? 'story' : 'stories'}</p>
+  </div>
+</header>
+
+<style>
+  .cat-header {
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+    padding-block: clamp(32px, 6vw, 56px);
+  }
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    margin: 8px 0 12px;
+  }
+  .lede {
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    color: var(--text-muted);
+    max-width: 60ch;
+  }
+  .count {
+    margin-top: 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+</style>

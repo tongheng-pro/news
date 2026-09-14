@@ -1,0 +1,269 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SearchBox from '../components/SearchBox.astro';
+import { getSearchIndex } from '../lib/news';
+import { categorySlug } from '../types/news';
+import { timeAgo } from '../lib/format';
+
+// The whole dataset is shipped to the client as a compact index. For ~60
+// mock articles this is a few KB. With a real backend this page would instead
+// call a search endpoint (or use a prebuilt Pagefind / Fuse index).
+const articles = await getSearchIndex();
+const index = articles.map((a) => ({
+  slug: a.slug,
+  title: a.title,
+  excerpt: a.excerpt,
+  category: a.category,
+  categorySlug: categorySlug(a.category),
+  source: a.source,
+  author: a.author,
+  tags: a.tags,
+  publishedAt: a.publishedAt,
+  ago: timeAgo(a.publishedAt),
+  readingTime: a.readingTime,
+}));
+---
+
+<Layout
+  title="Search"
+  description="Search TechPulse — find technology news by title, category, source or author."
+  canonical="/search"
+  noindex
+>
+  <section class="section">
+    <div class="container search-wrap">
+      <h1>Search</h1>
+      <p class="sub">Search {index.length} stories by title, category, source, author or tag.</p>
+
+      <SearchBox autofocus />
+
+      <p class="result-count" id="result-count" aria-live="polite"></p>
+
+      <div class="quick" id="quick-filters">
+        <span>Try:</span>
+        {['AI', 'NVIDIA', 'Cybersecurity', 'Apple', 'open source', 'funding'].map((t) => (
+          <button type="button" class="tag-pill" data-term={t}>{t}</button>
+        ))}
+      </div>
+
+      <ul class="results" id="results"></ul>
+
+      <div class="empty" id="empty-state" hidden>
+        <div class="empty-icon" aria-hidden="true">🔍</div>
+        <h2>No stories found</h2>
+        <p>Try a broader term, or browse a section from the navigation.</p>
+      </div>
+
+      <div class="empty" id="idle-state">
+        <div class="empty-icon" aria-hidden="true">📰</div>
+        <h2>Start typing to search</h2>
+        <p>Results update as you type. You can also link directly with <code>?q=your+terms</code>.</p>
+      </div>
+    </div>
+  </section>
+
+  <script type="application/json" id="search-index" is:inline set:html={JSON.stringify(index)}></script>
+
+  <script is:inline>
+    (function () {
+      var raw = document.getElementById('search-index');
+      var DATA = JSON.parse(raw.textContent || '[]');
+      var input = document.getElementById('search-input');
+      var results = document.getElementById('results');
+      var count = document.getElementById('result-count');
+      var empty = document.getElementById('empty-state');
+      var idle = document.getElementById('idle-state');
+      var form = input.closest('form');
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        run(input.value);
+        syncUrl(input.value);
+      });
+
+      document.getElementById('quick-filters').addEventListener('click', function (e) {
+        var b = e.target.closest('button[data-term]');
+        if (!b) return;
+        input.value = b.dataset.term;
+        run(b.dataset.term);
+        syncUrl(b.dataset.term);
+        input.focus();
+      });
+
+      var t;
+      input.addEventListener('input', function () {
+        clearTimeout(t);
+        t = setTimeout(function () {
+          run(input.value);
+          syncUrl(input.value);
+        }, 120);
+      });
+
+      function syncUrl(q) {
+        var u = new URL(location.href);
+        if (q) u.searchParams.set('q', q);
+        else u.searchParams.delete('q');
+        history.replaceState(null, '', u);
+      }
+
+      function esc(s) {
+        return s.replace(/[&<>"']/g, function (c) {
+          return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+        });
+      }
+
+      function match(article, terms) {
+        var hay = (
+          article.title +
+          ' ' +
+          article.excerpt +
+          ' ' +
+          article.category +
+          ' ' +
+          article.source +
+          ' ' +
+          article.author +
+          ' ' +
+          article.tags.join(' ')
+        ).toLowerCase();
+        return terms.every(function (term) {
+          return hay.indexOf(term) !== -1;
+        });
+      }
+
+      function run(query) {
+        var q = (query || '').trim().toLowerCase();
+        var terms = q.split(/\s+/).filter(Boolean);
+
+        if (!terms.length) {
+          results.innerHTML = '';
+          count.textContent = '';
+          empty.hidden = true;
+          idle.hidden = false;
+          return;
+        }
+        idle.hidden = true;
+
+        var found = DATA.filter(function (a) {
+          return match(a, terms);
+        });
+
+        count.textContent = found.length + (found.length === 1 ? ' result' : ' results');
+
+        if (!found.length) {
+          results.innerHTML = '';
+          empty.hidden = false;
+          return;
+        }
+        empty.hidden = true;
+
+        results.innerHTML = found
+          .map(function (a) {
+            return (
+              '<li class="result">' +
+              '<a class="r-link" href="/news/' + a.slug + '">' +
+              '<div class="r-meta"><span class="r-cat">' + esc(a.category) + '</span>' +
+              '<span class="dot">·</span><span>' + esc(a.source) + '</span>' +
+              '<span class="dot">·</span><span>' + esc(a.ago) + '</span></div>' +
+              '<h3>' + esc(a.title) + '</h3>' +
+              '<p>' + esc(a.excerpt) + '</p>' +
+              '</a></li>'
+            );
+          })
+          .join('');
+      }
+
+      // Initialise from ?q=
+      var initial = new URL(location.href).searchParams.get('q') || '';
+      if (initial) {
+        input.value = initial;
+        run(initial);
+      }
+    })();
+  </script>
+</Layout>
+
+<style>
+  .search-wrap {
+    max-width: 760px;
+  }
+  h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+  }
+  .sub {
+    color: var(--text-muted);
+    margin: 8px 0 24px;
+  }
+  .result-count {
+    margin: 20px 0 4px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    min-height: 1em;
+  }
+  .quick {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0 8px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .results {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+  }
+  .results :global(.result) {
+    border-bottom: 1px solid var(--border);
+  }
+  .results :global(.r-link) {
+    display: block;
+    padding: 18px 0;
+  }
+  .results :global(.r-link:hover h3) {
+    color: var(--accent);
+  }
+  .results :global(.r-meta) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .results :global(.r-cat) {
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .results :global(.r-link h3) {
+    font-size: 1.1rem;
+    line-height: 1.34;
+  }
+  .results :global(.r-link p) {
+    margin-top: 4px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+  .empty {
+    text-align: center;
+    padding: 48px 0;
+    color: var(--text-muted);
+  }
+  .empty[hidden] {
+    display: none;
+  }
+  .empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+  }
+  .empty h2 {
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+</style>

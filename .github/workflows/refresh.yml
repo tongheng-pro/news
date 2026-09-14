@@ -1,0 +1,43 @@
+# Rebuild + redeploy the site on a schedule so the news stays fresh.
+# This publishes to GitHub Pages; swap the deploy step for your host.
+#
+# The cron below runs every 15 minutes. GitHub may delay scheduled runs under
+# load, and disables schedules after 60 days of repo inactivity — for tighter
+# or more reliable timing use an external cron that hits a repository_dispatch
+# webhook, or host with a provider that supports ISR (Vercel / Netlify / Cloudflare).
+
+name: Refresh news
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: refresh-news
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+        env:
+          # Optional: broaden coverage. See .env.example.
+          NEWS_GOOGLE: 'false'
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

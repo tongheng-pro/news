@@ -1,0 +1,109 @@
+---
+export interface Props {
+  title: string;
+  /** Root-relative path; resolved against the site origin. */
+  path: string;
+}
+const { title, path } = Astro.props;
+const site = Astro.site ?? new URL('http://localhost:4321');
+const url = new URL(path, site).toString();
+const enc = encodeURIComponent;
+const links = [
+  { label: 'Share on X', short: 'X', href: `https://twitter.com/intent/tweet?text=${enc(title)}&url=${enc(url)}` },
+  { label: 'Share on LinkedIn', short: 'in', href: `https://www.linkedin.com/sharing/share-offsite/?url=${enc(url)}` },
+  { label: 'Share on Facebook', short: 'f', href: `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}` },
+  { label: 'Share by email', short: '@', href: `mailto:?subject=${enc(title)}&body=${enc(url)}` },
+];
+---
+
+<div class="share" data-share-url={url} data-share-title={title}>
+  <span class="share-label">Share</span>
+  <div class="share-btns">
+    {
+      links.map((l) => (
+        <a class="s-btn" href={l.href} target="_blank" rel="noopener noreferrer" aria-label={l.label}>
+          <span aria-hidden="true">{l.short}</span>
+        </a>
+      ))
+    }
+    <button type="button" class="s-btn s-copy" id="share-copy" aria-label="Copy link">
+      <span aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="12" height="12" rx="2" />
+          <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+        </svg>
+      </span>
+    </button>
+  </div>
+  <span class="copied" id="share-copied" role="status" aria-live="polite"></span>
+</div>
+
+<style>
+  .share {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .share-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+  }
+  .share-btns {
+    display: flex;
+    gap: 8px;
+  }
+  .s-btn {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    font-size: 0.82rem;
+    font-weight: 700;
+    transition: background-color 0.15s var(--ease), color 0.15s var(--ease),
+      border-color 0.15s var(--ease), transform 0.15s var(--ease);
+  }
+  .s-btn:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-contrast);
+    transform: translateY(-2px);
+  }
+  .copied {
+    font-size: 0.78rem;
+    color: var(--success);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var root = document.querySelector('.share');
+    if (!root) return;
+    var copyBtn = document.getElementById('share-copy');
+    var out = document.getElementById('share-copied');
+    var url = root.dataset.shareUrl;
+    var title = root.dataset.shareTitle;
+
+    // Prefer the native share sheet on mobile.
+    if (navigator.share) {
+      copyBtn.addEventListener('click', function () {
+        navigator.share({ title: title, url: url }).catch(function () {});
+      });
+    } else {
+      copyBtn.addEventListener('click', function () {
+        navigator.clipboard.writeText(url).then(function () {
+          out.textContent = 'Link copied';
+          setTimeout(function () {
+            out.textContent = '';
+          }, 2000);
+        });
+      });
+    }
+  })();
+</script>

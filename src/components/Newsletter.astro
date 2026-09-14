@@ -1,0 +1,116 @@
+---
+/**
+ * Newsletter sign-up. No backend in this build — the form validates the email
+ * client-side and shows a confirmation. Wire the `submit` handler to a real
+ * endpoint (or a service like Buttondown / ConvertKit) later.
+ */
+---
+
+<section class="section">
+  <div class="container">
+    <div class="newsletter">
+      <div class="nl-copy">
+        <p class="eyebrow">Newsletter</p>
+        <h2>The download</h2>
+        <p>
+          One email each morning: the technology stories that matter, explained in
+          five minutes. No spam, unsubscribe anytime.
+        </p>
+      </div>
+      <form class="nl-form" id="newsletter-form" novalidate>
+        <label class="visually-hidden" for="nl-email">Email address</label>
+        <input
+          type="email"
+          id="nl-email"
+          name="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        />
+        <button type="submit" class="btn btn-primary">Subscribe</button>
+        <p class="nl-msg" id="nl-msg" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<style>
+  .newsletter {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: center;
+    padding: clamp(24px, 4vw, 48px);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background:
+      radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 60%),
+      var(--surface);
+  }
+  .nl-copy h2 {
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    margin: 6px 0 10px;
+  }
+  .nl-copy p {
+    color: var(--text-muted);
+    max-width: 42ch;
+  }
+  .nl-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .nl-form input {
+    flex: 1;
+    min-width: 220px;
+    padding: 12px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--background);
+  }
+  .nl-form input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+  .nl-msg {
+    flex-basis: 100%;
+    font-size: 0.85rem;
+    min-height: 1.2em;
+    margin: 0;
+  }
+  .nl-msg.ok {
+    color: var(--success);
+  }
+  .nl-msg.err {
+    color: var(--danger);
+  }
+  @media (max-width: 760px) {
+    .newsletter {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var form = document.getElementById('newsletter-form');
+    if (!form) return;
+    var input = document.getElementById('nl-email');
+    var msg = document.getElementById('nl-msg');
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var value = (input.value || '').trim();
+      var valid = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value);
+      if (!valid) {
+        msg.textContent = 'Please enter a valid email address.';
+        msg.className = 'nl-msg err';
+        input.focus();
+        return;
+      }
+      // TODO: POST `value` to a real newsletter endpoint here.
+      msg.textContent = 'Thanks — check your inbox to confirm your subscription.';
+      msg.className = 'nl-msg ok';
+      form.reset();
+    });
+  })();
+</script>

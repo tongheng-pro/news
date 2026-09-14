@@ -1,0 +1,104 @@
+---
+import type { Article } from '../types/news';
+
+export interface Props {
+  article: Article;
+}
+const { article } = Astro.props;
+
+/**
+ * Live feeds give us a headline + short summary, not full article text (that's
+ * the correct aggregator pattern — link readers to the original). Mock articles
+ * carry a few paragraphs. Either way it's plain text with blank-line-separated
+ * paragraphs. If a future source provides real HTML body, sanitize it
+ * (sanitize-html / DOMPurify) and render with `<Fragment set:html={clean} />`.
+ */
+const paragraphs = article.content.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+const hasExternal = Boolean(article.sourceUrl && !article.isMock);
+---
+
+<div class:list={['article-content', { 'has-dropcap': paragraphs.length >= 3 }]}>
+  {paragraphs.map((p) => <p>{p}</p>)}
+
+  <div class="source-box">
+    <p class="source-label">Source attribution</p>
+    {article.isMock ? (
+      <p>
+        This is an original mock summary written for the demo dataset. In
+        production this space credits the originating publication.
+      </p>
+    ) : (
+      <p>
+        Summary of a report first published by <strong>{article.source}</strong>.
+        Read the full story on their site for the complete reporting.
+      </p>
+    )}
+    <a
+      href={article.sourceUrl ?? '#'}
+      class="btn"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      {hasExternal ? `Read the full story at ${article.source}` : 'Read the original article'}
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M7 17 17 7M8 7h9v9" />
+      </svg>
+    </a>
+  </div>
+
+  {
+    article.tags.length > 0 && (
+      <div class="tags">
+        {article.tags.map((t) => (
+          <a class="tag-pill" href={`/search?q=${encodeURIComponent(t)}`}>#{t}</a>
+        ))}
+      </div>
+    )
+  }
+</div>
+
+<style>
+  .article-content {
+    font-size: 1.12rem;
+    line-height: 1.75;
+  }
+  .article-content p {
+    margin-bottom: 1.4em;
+  }
+  .article-content.has-dropcap p:first-of-type::first-letter {
+    float: left;
+    font-size: 3.4em;
+    line-height: 0.82;
+    font-weight: 800;
+    padding-right: 0.08em;
+    color: var(--accent);
+  }
+  .source-box {
+    margin: 2em 0;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    font-size: 0.95rem;
+  }
+  .source-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .source-box .btn {
+    margin-top: 12px;
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 1.5em;
+    padding-top: 1.5em;
+    border-top: 1px solid var(--border);
+  }
+</style>

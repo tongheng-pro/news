@@ -1,0 +1,44 @@
+---
+/** Thin progress bar tracking scroll through the <article> element. */
+---
+
+<div class="reading-progress" aria-hidden="true">
+  <span id="reading-progress-bar"></span>
+</div>
+
+<style>
+  .reading-progress {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    right: 0;
+    height: 3px;
+    z-index: 95;
+    background: transparent;
+  }
+  #reading-progress-bar {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    transition: width 0.1s linear;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var bar = document.getElementById('reading-progress-bar');
+    var article = document.querySelector('article');
+    if (!bar || !article) return;
+    function update() {
+      var rect = article.getBoundingClientRect();
+      var total = rect.height - window.innerHeight;
+      var scrolled = Math.min(Math.max(-rect.top, 0), Math.max(total, 0));
+      var pct = total > 0 ? (scrolled / total) * 100 : 0;
+      bar.style.width = pct + '%';
+    }
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+</script>
