@@ -1,0 +1,580 @@
+---
+/**
+ * CapyMascotRig.astro
+ * Rigged SVG & CSS keyframe animated Capybara mascot with multiple action states:
+ * - idle: gentle breathing, blinking, ear twitch
+ * - walk: walking cycle with alternating paws, bobbing body, and ground bounce
+ * - smell: sniffing nose twitch, scent trails, curious head tilt
+ * - cry: tearful eyes, animated streaming tears, sniffling mouth
+ * - yuzu: balancing yuzu on head, blissful steam wisps
+ * - shout: megaphone blast with animated acoustic soundwaves
+ */
+export interface Props {
+  initialAction?: 'idle' | 'walk' | 'smell' | 'cry' | 'yuzu' | 'shout';
+  size?: number;
+  interactive?: boolean;
+}
+
+const { initialAction = 'idle', size = 180, interactive = true } = Astro.props;
+---
+
+<div 
+  class:list={['capy-rig-container', `action-${initialAction}`, { 'is-interactive': interactive }]} 
+  id="capy-interactive-rig"
+  data-action={initialAction}
+  style={`--capy-size: ${size}px;`}
+>
+  <!-- Interactive Action Speech Bubble -->
+  <div class="rig-bubble" id="rig-speech-bubble">
+    <span class="bubble-text" id="rig-speech-text">"Sip your tea and stay chill! 🐾"</span>
+  </div>
+
+  <!-- Rigged SVG Capybara -->
+  <svg 
+    class="capy-svg" 
+    viewBox="0 0 200 190" 
+    width={size} 
+    height={size * 0.95} 
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <!-- Gradients based on exact palette -->
+      <linearGradient id="capyBodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#4B8DFF"/>
+        <stop offset="50%" stop-color="#2875FB"/>
+        <stop offset="100%" stop-color="#144CBD"/>
+      </linearGradient>
+
+      <linearGradient id="capySnoutGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#3A6ED8"/>
+        <stop offset="100%" stop-color="#1E4496"/>
+      </linearGradient>
+
+      <linearGradient id="yuzuGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stop-color="#FFA826"/>
+        <stop offset="100%" stop-color="#E57200"/>
+      </linearGradient>
+
+      <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+      </filter>
+    </defs>
+
+    <!-- Shadow under feet -->
+    <ellipse class="ground-shadow" cx="100" cy="178" rx="65" ry="8" fill="#030E50" opacity="0.16"/>
+
+    <!-- Yuzu / Orange on Head (Shown during 'yuzu' state) -->
+    <g class="action-fx yuzu-group" id="fx-yuzu">
+      <ellipse cx="100" cy="22" rx="14" ry="12" fill="url(#yuzuGrad)"/>
+      <path d="M100 10 Q105 5 110 8" stroke="#3D7B24" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <circle cx="96" cy="18" r="2" fill="#FFFFFF" opacity="0.6"/>
+      <!-- Steam wisps -->
+      <path class="steam-wisp wisp-1" d="M85 10 Q80 2 86 -6" stroke="#C3D7FC" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
+      <path class="steam-wisp wisp-2" d="M100 6 Q106 -2 100 -12" stroke="#C3D7FC" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
+      <path class="steam-wisp wisp-3" d="M115 10 Q120 2 114 -6" stroke="#C3D7FC" stroke-width="2" fill="none" stroke-linecap="round" opacity="0.7"/>
+    </g>
+
+    <!-- Back Paws (Left & Right) for walk cycle -->
+    <g class="paws-back">
+      <rect class="paw paw-back-left" x="66" y="152" width="18" height="26" rx="8" fill="#144CBD"/>
+      <rect class="paw paw-back-right" x="116" y="152" width="18" height="26" rx="8" fill="#144CBD"/>
+    </g>
+
+    <!-- Main Character Body & Head Group -->
+    <g class="capy-torso">
+      <!-- Ears -->
+      <g class="ear ear-left">
+        <ellipse cx="62" cy="46" rx="12" ry="15" fill="#2875FB" transform="rotate(-15 62 46)"/>
+        <ellipse cx="62" cy="46" rx="6" ry="9" fill="#C3D7FC" transform="rotate(-15 62 46)"/>
+      </g>
+      <g class="ear ear-right">
+        <ellipse cx="138" cy="46" rx="12" ry="15" fill="#2875FB" transform="rotate(15 138 46)"/>
+        <ellipse cx="138" cy="46" rx="6" ry="9" fill="#C3D7FC" transform="rotate(15 138 46)"/>
+      </g>
+
+      <!-- Fluffy Body Shape -->
+      <path 
+        class="body-flesh"
+        d="M52 70 
+           C42 85 40 120 48 142 
+           C54 158 74 165 100 165 
+           C126 165 146 158 152 142 
+           C160 120 158 85 148 70 
+           C140 50 122 38 100 38 
+           C78 38 60 50 52 70 Z" 
+        fill="url(#capyBodyGrad)"
+      />
+
+      <!-- Snout Section -->
+      <g class="snout-group" id="snout-group">
+        <ellipse cx="100" cy="116" rx="26" ry="24" fill="url(#capySnoutGrad)"/>
+        <!-- Nostrils -->
+        <ellipse cx="94" cy="112" rx="2.5" ry="3.5" fill="#030E50"/>
+        <ellipse cx="106" cy="112" rx="2.5" ry="3.5" fill="#030E50"/>
+        <!-- Smile Line -->
+        <path class="mouth normal-mouth" d="M100 118 L100 125 M92 125 Q100 131 108 125" stroke="#030E50" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <!-- Sad / Crying Mouth -->
+        <path class="mouth sad-mouth" d="M100 118 L100 124 M92 128 Q100 122 108 128" stroke="#030E50" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <!-- Open Shouting Mouth -->
+        <ellipse class="mouth open-mouth" cx="100" cy="126" rx="7" ry="6" fill="#8F5D38"/>
+      </g>
+
+      <!-- Eyes (Big Furry Mascot Eyes) -->
+      <!-- Left Eye -->
+      <g class="eye-unit eye-left">
+        <circle cx="76" cy="94" r="19" fill="#FFFFFF"/>
+        <circle class="pupil" cx="78" cy="94" r="14" fill="#030E50"/>
+        <circle class="glint-main" cx="74" cy="89" r="5" fill="#FFFFFF"/>
+        <circle class="glint-sub" cx="81" cy="98" r="2.5" fill="#FFFFFF"/>
+        <!-- Eyelid for Blinking / Bliss -->
+        <path class="eyelid" d="M57 94 Q76 74 95 94 Z" fill="#2875FB"/>
+        <path class="closed-happy" d="M60 96 Q76 86 92 96" stroke="#030E50" stroke-width="3" stroke-linecap="round" fill="none"/>
+      </g>
+
+      <!-- Right Eye -->
+      <g class="eye-unit eye-right">
+        <circle cx="124" cy="94" r="19" fill="#FFFFFF"/>
+        <circle class="pupil" cx="122" cy="94" r="14" fill="#030E50"/>
+        <circle class="glint-main" cx="118" cy="89" r="5" fill="#FFFFFF"/>
+        <circle class="glint-sub" cx="125" cy="98" r="2.5" fill="#FFFFFF"/>
+        <!-- Eyelid -->
+        <path class="eyelid" d="M105 94 Q124 74 143 94 Z" fill="#2875FB"/>
+        <path class="closed-happy" d="M108 96 Q124 86 140 96" stroke="#030E50" stroke-width="3" stroke-linecap="round" fill="none"/>
+      </g>
+
+      <!-- Front Arms / Paws -->
+      <g class="front-paws">
+        <ellipse class="arm arm-left" cx="54" cy="138" rx="8" ry="14" fill="#2875FB" transform="rotate(20 54 138)"/>
+        <ellipse class="arm arm-right" cx="146" cy="138" rx="8" ry="14" fill="#2875FB" transform="rotate(-20 146 138)"/>
+      </g>
+
+      <!-- Front Feet for Walk Cycle -->
+      <rect class="paw paw-front-left" x="78" y="156" width="16" height="24" rx="7" fill="#2875FB"/>
+      <rect class="paw paw-front-right" x="106" y="156" width="16" height="24" rx="7" fill="#2875FB"/>
+    </g>
+
+    <!-- Crying Animation Effects: Big Waterfall Tears & Droplets -->
+    <g class="action-fx cry-fx" id="fx-cry">
+      <!-- Streaming waterfall tears -->
+      <path class="tear-stream tear-stream-left" d="M72 108 Q68 135 70 160" stroke="#C3D7FC" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.85"/>
+      <path class="tear-stream tear-stream-right" d="M128 108 Q132 135 130 160" stroke="#C3D7FC" stroke-width="5" stroke-linecap="round" fill="none" opacity="0.85"/>
+      <!-- Falling tear drops -->
+      <circle class="tear-drop drop-1" cx="70" cy="120" r="4.5" fill="#C3D7FC" filter="url(#softGlow)"/>
+      <circle class="tear-drop drop-2" cx="130" cy="125" r="4.5" fill="#C3D7FC" filter="url(#softGlow)"/>
+      <circle class="tear-drop drop-3" cx="72" cy="145" r="4" fill="#FFFFFF"/>
+      <circle class="tear-drop drop-4" cx="128" cy="150" r="4" fill="#FFFFFF"/>
+      <!-- Puddle on ground -->
+      <ellipse class="tear-puddle" cx="100" cy="178" rx="35" ry="6" fill="#C3D7FC" opacity="0.6"/>
+    </g>
+
+    <!-- Smelling Animation Effects: Sniff Scent Waves & Stars -->
+    <g class="action-fx smell-fx" id="fx-smell">
+      <!-- Scent waves wafting to nostrils -->
+      <path class="scent-wave wave-1" d="M40 95 Q65 110 88 112" stroke="#2875FB" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4,4" fill="none"/>
+      <path class="scent-wave wave-2" d="M160 95 Q135 110 112 112" stroke="#2875FB" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="4,4" fill="none"/>
+      <path class="scent-wave wave-3" d="M100 70 Q105 90 100 106" stroke="#C3D7FC" stroke-width="2" stroke-linecap="round" stroke-dasharray="3,3" fill="none"/>
+      <!-- Sniff sparkles -->
+      <polygon class="sniff-sparkle s-1" points="48,85 51,92 58,95 51,98 48,105 45,98 38,95 45,92" fill="#FFA826"/>
+      <polygon class="sniff-sparkle s-2" points="152,85 155,92 162,95 155,98 152,105 149,98 142,95 149,92" fill="#FFA826"/>
+    </g>
+
+    <!-- Megaphone / Shout FX -->
+    <g class="action-fx shout-fx" id="fx-shout">
+      <!-- Megaphone in hand -->
+      <g transform="translate(130, 105) rotate(-20)">
+        <polygon points="10,12 35,-5 35,30 10,14" fill="#A4B4CC" stroke="#030E50" stroke-width="2"/>
+        <rect x="0" y="8" width="12" height="9" rx="2" fill="#5A6D88"/>
+        <rect x="2" y="16" width="6" height="10" rx="2" fill="#030E50"/>
+      </g>
+      <!-- Soundwaves blasting out -->
+      <path class="sound-ring r-1" d="M170 85 A 15 15 0 0 1 170 120" stroke="#2875FB" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path class="sound-ring r-2" d="M180 75 A 25 25 0 0 1 180 130" stroke="#8F5D38" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path class="sound-ring r-3" d="M190 65 A 35 35 0 0 1 190 140" stroke="#2875FB" stroke-width="3" fill="none" stroke-linecap="round"/>
+    </g>
+  </svg>
+
+  <!-- Interactive Action Trigger Buttons -->
+  {interactive && (
+    <div class="action-controller">
+      <span class="action-ctrl-label">Capy Actions:</span>
+      <div class="action-btn-row">
+        <button type="button" class="act-btn" data-act="walk" title="Watch Capy walk and waddle!">
+          <span class="btn-emoji">🚶</span>
+          <span>Walk</span>
+        </button>
+        <button type="button" class="act-btn" data-act="smell" title="Sniff fresh news scoops!">
+          <span class="btn-emoji">👃</span>
+          <span>Sniff</span>
+        </button>
+        <button type="button" class="act-btn" data-act="cry" title="Emotional tears for world news">
+          <span class="btn-emoji">😢</span>
+          <span>Cry</span>
+        </button>
+        <button type="button" class="act-btn" data-act="yuzu" title="Capybara hot spring yuzu chill">
+          <span class="btn-emoji">🍊</span>
+          <span>Yuzu</span>
+        </button>
+        <button type="button" class="act-btn" data-act="shout" title="Megaphone breaking announcement">
+          <span class="btn-emoji">📣</span>
+          <span>Shout</span>
+        </button>
+        <button type="button" class="act-btn act-reset" data-act="idle" title="Reset to chill idle">
+          <span class="btn-emoji">🐾</span>
+          <span>Chill</span>
+        </button>
+      </div>
+    </div>
+  )}
+</div>
+
+<style>
+  .capy-rig-container {
+    position: relative;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    width: var(--capy-size);
+    user-select: none;
+  }
+
+  .capy-svg {
+    display: block;
+    overflow: visible;
+    filter: drop-shadow(0 8px 18px rgba(40, 117, 251, 0.2));
+    transition: transform 0.25s var(--ease);
+  }
+
+  /* Interactive Speech Bubble */
+  .rig-bubble {
+    background: #030E50;
+    color: #FFFFFF;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--periwinkle);
+    box-shadow: 0 4px 14px rgba(3, 14, 80, 0.25);
+    margin-bottom: 8px;
+    white-space: nowrap;
+    position: relative;
+    transition: all 0.2s var(--ease);
+  }
+  .rig-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px 6px 0 6px;
+    border-style: solid;
+    border-color: #030E50 transparent transparent transparent;
+  }
+
+  /* FX Hidden By Default */
+  .action-fx {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s var(--ease);
+  }
+  .closed-happy, .eyelid, .sad-mouth, .open-mouth {
+    opacity: 0;
+  }
+
+  /* ------------------------------------------------------------- 1. IDLE STATE */
+  .capy-torso {
+    transform-origin: 100px 140px;
+    animation: idle-breathe 3.5s ease-in-out infinite;
+  }
+  @keyframes idle-breathe {
+    0%, 100% { transform: scale(1) translateY(0); }
+    50% { transform: scale(1.02, 0.98) translateY(1.5px); }
+  }
+
+  /* Ear gentle twitches */
+  .ear-left {
+    transform-origin: 62px 46px;
+    animation: ear-twitch-left 5s ease-in-out infinite;
+  }
+  .ear-right {
+    transform-origin: 138px 46px;
+    animation: ear-twitch-right 6s ease-in-out infinite;
+  }
+  @keyframes ear-twitch-left {
+    0%, 90%, 100% { transform: rotate(0deg); }
+    93% { transform: rotate(-8deg); }
+    96% { transform: rotate(4deg); }
+  }
+  @keyframes ear-twitch-right {
+    0%, 88%, 100% { transform: rotate(0deg); }
+    92% { transform: rotate(8deg); }
+    95% { transform: rotate(-4deg); }
+  }
+
+  /* Blinking Eyes */
+  .eyelid {
+    animation: blink-cycle 4.5s infinite;
+  }
+  @keyframes blink-cycle {
+    0%, 95%, 100% { opacity: 0; transform: scaleY(0); }
+    97% { opacity: 1; transform: scaleY(1); }
+  }
+
+  /* ------------------------------------------------------------- 2. WALKING ANIMATION */
+  .action-walk .capy-svg {
+    animation: walk-bounce 0.6s ease-in-out infinite alternate;
+  }
+  @keyframes walk-bounce {
+    0% { transform: translateY(0) rotate(-2deg); }
+    100% { transform: translateY(-7px) rotate(2deg); }
+  }
+
+  .action-walk .paw-front-left {
+    transform-origin: 86px 156px;
+    animation: walk-paw-front 0.6s ease-in-out infinite alternate;
+  }
+  .action-walk .paw-front-right {
+    transform-origin: 114px 156px;
+    animation: walk-paw-front 0.6s ease-in-out infinite alternate-reverse;
+  }
+  .action-walk .paw-back-left {
+    transform-origin: 75px 152px;
+    animation: walk-paw-back 0.6s ease-in-out infinite alternate-reverse;
+  }
+  .action-walk .paw-back-right {
+    transform-origin: 125px 152px;
+    animation: walk-paw-back 0.6s ease-in-out infinite alternate;
+  }
+  @keyframes walk-paw-front {
+    0% { transform: rotate(-18deg) translateY(-2px); }
+    100% { transform: rotate(18deg) translateY(2px); }
+  }
+  @keyframes walk-paw-back {
+    0% { transform: rotate(16deg); }
+    100% { transform: rotate(-16deg); }
+  }
+
+  /* ------------------------------------------------------------- 3. SMELLING / SNIFFING ANIMATION */
+  .action-smell #fx-smell {
+    opacity: 1;
+  }
+  .action-smell .snout-group {
+    transform-origin: 100px 116px;
+    animation: sniff-twitch 0.22s ease-in-out infinite alternate;
+  }
+  .action-smell .capy-torso {
+    animation: sniff-lift 0.6s ease-in-out infinite alternate;
+  }
+  @keyframes sniff-twitch {
+    0% { transform: translateY(0) scale(1); }
+    100% { transform: translateY(-4px) scale(1.05, 0.95); }
+  }
+  @keyframes sniff-lift {
+    0% { transform: translateY(0) rotate(-1deg); }
+    100% { transform: translateY(-3px) rotate(1deg); }
+  }
+  .action-smell .scent-wave {
+    animation: waft 1.2s linear infinite;
+  }
+  @keyframes waft {
+    0% { stroke-dashoffset: 20; opacity: 0.2; }
+    50% { opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0.2; }
+  }
+  .action-smell .sniff-sparkle {
+    animation: sparkle-pulse 0.8s ease-in-out infinite alternate;
+  }
+  @keyframes sparkle-pulse {
+    0% { transform: scale(0.7) rotate(0deg); opacity: 0.4; }
+    100% { transform: scale(1.2) rotate(45deg); opacity: 1; }
+  }
+
+  /* ------------------------------------------------------------- 4. CRYING ANIMATION */
+  .action-cry #fx-cry {
+    opacity: 1;
+  }
+  .action-cry .normal-mouth {
+    display: none;
+  }
+  .action-cry .sad-mouth {
+    opacity: 1;
+  }
+  .action-cry .capy-torso {
+    animation: sob-shiver 0.25s ease-in-out infinite alternate;
+  }
+  @keyframes sob-shiver {
+    0% { transform: translateY(0) scale(1); }
+    100% { transform: translateY(1.5px) scale(0.99, 1.01); }
+  }
+  .action-cry .tear-stream {
+    stroke-dasharray: 60;
+    animation: stream-flow 0.8s linear infinite;
+  }
+  @keyframes stream-flow {
+    0% { stroke-dashoffset: 60; }
+    100% { stroke-dashoffset: 0; }
+  }
+  .action-cry .tear-drop {
+    animation: tear-fall 0.7s cubic-bezier(0.4, 0, 1, 1) infinite;
+  }
+  .action-cry .drop-2 { animation-delay: 0.35s; }
+  .action-cry .drop-3 { animation-delay: 0.15s; }
+  .action-cry .drop-4 { animation-delay: 0.5s; }
+  @keyframes tear-fall {
+    0% { transform: translateY(-10px); opacity: 0; }
+    30% { opacity: 1; }
+    100% { transform: translateY(35px); opacity: 0; }
+  }
+
+  /* ------------------------------------------------------------- 5. YUZU / HOT SPRING CHILL */
+  .action-yuzu #fx-yuzu {
+    opacity: 1;
+  }
+  .action-yuzu .pupil, 
+  .action-yuzu .glint-main, 
+  .action-yuzu .glint-sub {
+    opacity: 0;
+  }
+  .action-yuzu .closed-happy {
+    opacity: 1;
+  }
+  .action-yuzu .steam-wisp {
+    animation: steam-rise 2s ease-out infinite;
+  }
+  .wisp-2 { animation-delay: 0.6s; }
+  .wisp-3 { animation-delay: 1.2s; }
+  @keyframes steam-rise {
+    0% { transform: translateY(0) scale(0.8); opacity: 0; }
+    50% { opacity: 0.8; }
+    100% { transform: translateY(-18px) scale(1.3); opacity: 0; }
+  }
+
+  /* ------------------------------------------------------------- 6. SHOUTING MEGAPHONE */
+  .action-shout #fx-shout {
+    opacity: 1;
+  }
+  .action-shout .normal-mouth { display: none; }
+  .action-shout .open-mouth { opacity: 1; }
+  .action-shout .sound-ring {
+    animation: sound-blast 0.9s ease-out infinite;
+  }
+  .action-shout .r-2 { animation-delay: 0.3s; }
+  .action-shout .r-3 { animation-delay: 0.6s; }
+  @keyframes sound-blast {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: scale(1.4); opacity: 0; }
+  }
+
+  /* ------------------------------------------------------------- Action Controller UI */
+  .action-controller {
+    margin-top: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .action-ctrl-label {
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+
+  .action-btn-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .act-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 9px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.72rem;
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    transition: all 0.16s var(--ease);
+  }
+  .act-btn:hover {
+    background: var(--periwinkle-light);
+    border-color: var(--royal);
+    color: var(--royal);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px var(--royal-glow);
+  }
+  .act-btn.active {
+    background: var(--royal);
+    color: #FFFFFF;
+    border-color: var(--royal);
+  }
+  .act-btn .btn-emoji {
+    font-size: 0.85rem;
+  }
+  .act-reset {
+    background: var(--surface-2);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var rig = document.getElementById('capy-interactive-rig');
+    var bubbleText = document.getElementById('rig-speech-text');
+    if (!rig) return;
+
+    var actionQuotes = {
+      idle: '🐾 "Sip your tea and stay chill!"',
+      walk: '🚶 *Tip-tap tip-tap* "On patrol for balanced news!"',
+      smell: '👃 *Sniff sniff* "Mmm! Smells like fresh scoops and roasted coffee!"',
+      cry: '😢 *Sob sob* "This world news touched Capy right in the feels..."',
+      yuzu: '🍊 *Zen mode engaged* "Warm onsen vibes. Zero doomscrolling."',
+      shout: '📣 *ALERT!* "Extra! Extra! Read the verified source!"'
+    };
+
+    var buttons = rig.querySelectorAll('.act-btn');
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var act = btn.getAttribute('data-act') || 'idle';
+        setCapyAction(act);
+      });
+    });
+
+    function setCapyAction(act) {
+      rig.className = rig.className.replace(/\baction-\w+/g, '');
+      rig.classList.add('action-' + act);
+      rig.setAttribute('data-action', act);
+
+      // Update active button state
+      buttons.forEach(function (b) {
+        if (b.getAttribute('data-act') === act) {
+          b.classList.add('active');
+        } else {
+          b.classList.remove('active');
+        }
+      });
+
+      // Update Speech Bubble
+      if (bubbleText && actionQuotes[act]) {
+        bubbleText.textContent = actionQuotes[act];
+      }
+
+      // If 'walk', let's trigger screen walk effect if available!
+      if (act === 'walk' && window.triggerCapyPageWalk) {
+        window.triggerCapyPageWalk();
+      }
+    }
+
+    // Expose global controller so companion / sidebar buttons can command the rig!
+    window.setCapyMascotAction = setCapyAction;
+  })();
+</script>
+

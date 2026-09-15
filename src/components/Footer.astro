@@ -4,23 +4,23 @@ import { CATEGORIES } from '../types/news';
 const year = new Date().getFullYear();
 const cols = [
   {
-    title: 'Sections',
+    title: 'Editorial Sections',
     links: CATEGORIES.slice(0, 6).map((c) => ({ href: `/category/${c.slug}`, label: c.name })),
   },
   {
-    title: 'More',
+    title: 'Exploration',
     links: [
       ...CATEGORIES.slice(6).map((c) => ({ href: `/category/${c.slug}`, label: c.name })),
-      { href: '/trending', label: 'Trending' },
+      { href: '/trending', label: '🔥 Trending Leaderboard' },
     ],
   },
   {
-    title: 'TechPulse',
+    title: 'Capy Media',
     links: [
-      { href: '/search', label: 'Search' },
-      { href: '/trending', label: 'Most read' },
-      { href: '/sitemap.xml', label: 'Sitemap' },
-      { href: '/rss.xml', label: 'RSS feed' },
+      { href: '/search', label: 'Search Archives' },
+      { href: '#newsletter', label: 'Daily Dispatch Newsletter' },
+      { href: '/rss.xml', label: 'RSS Newsfeed' },
+      { href: '/sitemap.xml', label: 'Site Index' },
     ],
   },
 ];
@@ -28,22 +28,33 @@ const cols = [
 
 <footer class="site-footer">
   <div class="container">
-    <div class="top">
-      <div class="brand">
-        <img class="logo-mark" src="/news.png" alt="TechPulse" width="66" height="44" />
-        <p>
-          Independent coverage of technology and the wider world. Built with Astro —
-          fast, static and open.
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="/" class="brand-link">
+          <img class="footer-avatar" src="/mascot-avatar.png" alt="Capy mascot" width="50" height="50" />
+          <div class="brand-info">
+            <span class="brand-name">Capy<span class="royal">News</span></span>
+            <span class="brand-sub">Independent Calm Journalism</span>
+          </div>
+        </a>
+        <p class="brand-desc">
+          Balancing critical global tech insights with the calming wisdom of our 3D furry capybara mascot. 
+          Fact-checked, high-signal, and zero doomscrolling.
         </p>
+        <div class="mascot-status-pill">
+          <span class="paw">🐾</span>
+          <span>Editor Capy is reading the morning wires</span>
+        </div>
       </div>
+
       {
         cols.map((col) => (
-          <nav class="col" aria-label={col.title}>
-            <h3>{col.title}</h3>
-            <ul>
+          <nav class="footer-col" aria-label={col.title}>
+            <h3 class="col-heading">{col.title}</h3>
+            <ul class="col-links">
               {col.links.map((l) => (
                 <li>
-                  <a href={l.href}>{l.label}</a>
+                  <a href={l.href} class="footer-link">{l.label}</a>
                 </li>
               ))}
             </ul>
@@ -51,77 +62,163 @@ const cols = [
         ))
       }
     </div>
-    <div class="bottom">
-      <p>© {year} TechPulse. Mock content for demonstration — no article here is real.</p>
-      <p class="muted">Made with Astro · No trackers · No cookies</p>
+
+    <div class="footer-bottom">
+      <div class="bottom-left">
+        <p>© {year} CapyNews Media Inc. High-End Editorial Template.</p>
+        <p class="palette-indicator">
+          Palette: <span class="swatch-tag" style="color:#C3D7FC">#C3D7FC</span> • 
+          <span class="swatch-tag" style="color:#2875FB">#2875FB</span> • 
+          <span class="swatch-tag" style="color:#8F5D38">#8F5D38</span> • 
+          <span class="swatch-tag" style="color:#FFFFFF">#030E50</span>
+        </p>
+      </div>
+      <div class="bottom-right">
+        <span>Designed with precision • Dribbble & Behance Trending UI</span>
+      </div>
     </div>
   </div>
 </footer>
 
 <style>
   .site-footer {
-    margin-top: 64px;
-    border-top: 1px solid var(--border);
-    background: var(--surface-2);
-    padding-block: 48px 28px;
+    margin-top: 80px;
+    border-top: 2px solid var(--periwinkle);
+    background: linear-gradient(180deg, #030E50 0%, #020726 100%);
+    color: #FFFFFF;
+    padding-block: 60px 32px;
   }
-  .top {
+
+  .footer-top {
     display: grid;
-    grid-template-columns: 1.6fr repeat(3, 1fr);
-    gap: 32px;
+    grid-template-columns: 1.5fr repeat(3, 1fr);
+    gap: 40px;
   }
-  .brand .logo-mark {
-    height: 44px;
-    width: auto;
+
+  .footer-brand {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .footer-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 2px solid var(--periwinkle);
+    background: #FFFFFF;
+  }
+
+  .brand-name {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #FFFFFF;
+    line-height: 1.1;
+  }
+
+  .royal {
+    color: var(--royal);
+  }
+
+  .brand-sub {
     display: block;
+    font-size: 0.72rem;
+    color: var(--periwinkle);
+    letter-spacing: 0.04em;
   }
-  .brand p {
-    margin-top: 10px;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    max-width: 34ch;
+
+  .brand-desc {
+    color: var(--periwinkle);
+    font-size: 0.88rem;
+    line-height: 1.6;
+    max-width: 36ch;
+    opacity: 0.9;
   }
-  .col h3 {
+
+  .mascot-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(195, 215, 252, 0.12);
+    border: 1px solid rgba(195, 215, 252, 0.25);
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
     font-size: 0.75rem;
+    color: var(--periwinkle);
+    width: fit-content;
+  }
+
+  .footer-col {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .col-heading {
+    font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--text-muted);
-    margin-bottom: 12px;
+    color: var(--periwinkle);
+    font-weight: 800;
   }
-  .col ul {
+
+  .col-links {
     list-style: none;
     padding: 0;
     margin: 0;
-    display: grid;
-    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
-  .col a {
-    font-size: 0.9rem;
-    color: var(--text);
+
+  .footer-link {
+    font-size: 0.88rem;
+    color: #DDE8FD;
+    transition: color 0.15s var(--ease), transform 0.15s var(--ease);
+    display: inline-block;
   }
-  .col a:hover {
-    color: var(--accent);
+  .footer-link:hover {
+    color: var(--royal);
+    transform: translateX(4px);
   }
-  .bottom {
-    margin-top: 36px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
+
+  .footer-bottom {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(195, 215, 252, 0.2);
     display: flex;
     justify-content: space-between;
+    align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
-    font-size: 0.82rem;
-    color: var(--text-muted);
+    gap: 14px;
+    font-size: 0.8rem;
+    color: var(--periwinkle);
+    opacity: 0.85;
   }
-  @media (max-width: 860px) {
-    .top {
+
+  .swatch-tag {
+    font-weight: 700;
+  }
+
+  @media (max-width: 960px) {
+    .footer-top {
       grid-template-columns: 1fr 1fr;
     }
   }
-  @media (max-width: 520px) {
-    .top {
+
+  @media (max-width: 580px) {
+    .footer-top {
       grid-template-columns: 1fr;
-      gap: 24px;
+    }
+    .footer-bottom {
+      flex-direction: column;
+      align-items: flex-start;
     }
   }
 </style>

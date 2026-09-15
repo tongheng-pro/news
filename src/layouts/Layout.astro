@@ -4,6 +4,8 @@ import SEO from '../components/SEO.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import BackToTop from '../components/BackToTop.astro';
+import CapyCompanion from '../components/CapyCompanion.astro';
+import CapyScreenWalker from '../components/CapyScreenWalker.astro';
 
 export interface Props {
   title: string;
@@ -30,11 +32,12 @@ const { wrapMain = true, ...seo } = Astro.props;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/favicon.png" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#0b0d12" media="(prefers-color-scheme: dark)" />
-    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#030E50" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#F9FBFE" media="(prefers-color-scheme: light)" />
     <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
     <SEO {...seo} />
 
@@ -65,5 +68,7 @@ const { wrapMain = true, ...seo } = Astro.props;
     }
     <Footer />
     <BackToTop />
+    <CapyCompanion />
+    <CapyScreenWalker />
   </body>
 </html>

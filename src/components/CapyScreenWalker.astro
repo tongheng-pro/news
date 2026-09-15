@@ -1,0 +1,226 @@
+---
+/**
+ * CapyScreenWalker.astro
+ * An interactive capybara that can walk across the bottom of the screen,
+ * waddling with moving paws, sniffing along the way, and dropping paw prints!
+ */
+---
+
+<div class="capy-screen-walker" id="screen-walker" hidden>
+  <div class="walker-character" id="walker-char" title="Click me to pet or feed a treat!">
+    <div class="walker-bubble" id="walker-speech">
+      <span>*Tip-tap tip-tap* 🐾</span>
+    </div>
+    <div class="walker-body-wrap">
+      <img 
+        src="/mascot-standing.png" 
+        alt="Walking capybara mascot" 
+        class="walker-sprite"
+        width="64" 
+        height="64"
+      />
+    </div>
+  </div>
+</div>
+
+<style>
+  .capy-screen-walker {
+    position: fixed;
+    bottom: 12px;
+    left: 0;
+    width: 100vw;
+    height: 90px;
+    pointer-events: none;
+    z-index: 110;
+    overflow: hidden;
+  }
+  .capy-screen-walker[hidden] {
+    display: none;
+  }
+
+  .walker-character {
+    position: absolute;
+    bottom: 0;
+    left: -80px;
+    pointer-events: auto;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.15s ease;
+  }
+
+  .walker-character:hover {
+    transform: scale(1.1);
+  }
+
+  .walker-bubble {
+    background: #030E50;
+    color: #FFFFFF;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--periwinkle);
+    white-space: nowrap;
+    margin-bottom: 4px;
+    box-shadow: 0 4px 12px rgba(3, 14, 80, 0.3);
+  }
+
+  .walker-body-wrap {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2px solid var(--royal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(40, 117, 251, 0.35);
+    animation: waddle-bounce 0.45s ease-in-out infinite alternate;
+  }
+
+  .walker-sprite {
+    width: 52px;
+    height: 52px;
+    object-fit: cover;
+  }
+
+  @keyframes waddle-bounce {
+    0% {
+      transform: translateY(0) rotate(-4deg);
+    }
+    100% {
+      transform: translateY(-8px) rotate(4deg);
+    }
+  }
+
+  /* Paw print drops */
+  :global(.paw-print-drop) {
+    position: fixed;
+    font-size: 1.1rem;
+    pointer-events: none;
+    z-index: 109;
+    opacity: 0.75;
+    animation: paw-fade 2.5s forwards;
+  }
+  @keyframes paw-fade {
+    0% {
+      transform: scale(0.6) translateY(0);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1) translateY(-4px);
+      opacity: 0.6;
+    }
+    100% {
+      transform: scale(1.1) translateY(-10px);
+      opacity: 0;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var container = document.getElementById('screen-walker');
+    var char = document.getElementById('walker-char');
+    var speech = document.getElementById('walker-speech');
+    if (!container || !char) return;
+
+    var posX = -80;
+    var speed = 2.2;
+    var direction = 1; // 1 = right, -1 = left
+    var isWalking = false;
+    var animFrameId = null;
+    var lastPawX = -100;
+
+    var walkPhrases = [
+      '*Tip-tap tip-tap* 🐾',
+      '*Sniff sniff* Smells like fresh tech news!',
+      'Just strolling through the headlines~ 🚶',
+      'Fact-checking in progress... 🔎',
+      'Stay chill and keep reading! ☕',
+      '10/10 chill vibes today 🍊'
+    ];
+
+    function spawnPawPrint(x, y) {
+      var paw = document.createElement('div');
+      paw.className = 'paw-print-drop';
+      paw.textContent = '🐾';
+      paw.style.left = x + 20 + 'px';
+      paw.style.bottom = '18px';
+      document.body.appendChild(paw);
+      setTimeout(function () {
+        paw.remove();
+      }, 2500);
+    }
+
+    function step() {
+      if (!isWalking) return;
+
+      var maxW = window.innerWidth;
+      posX += speed * direction;
+
+      // Drop paw print every 50px
+      if (Math.abs(posX - lastPawX) > 45) {
+        lastPawX = posX;
+        spawnPawPrint(posX, 20);
+      }
+
+      // Check boundary turnarounds
+      if (direction === 1 && posX > maxW + 40) {
+        direction = -1;
+        char.style.transform = 'scaleX(-1)';
+        updateSpeech();
+      } else if (direction === -1 && posX < -90) {
+        direction = 1;
+        char.style.transform = 'scaleX(1)';
+        updateSpeech();
+      }
+
+      char.style.left = posX + 'px';
+      animFrameId = requestAnimationFrame(step);
+    }
+
+    function updateSpeech() {
+      if (!speech) return;
+      var randomIdx = Math.floor(Math.random() * walkPhrases.length);
+      speech.innerHTML = '<span>' + walkPhrases[randomIdx] + '</span>';
+    }
+
+    function startWalk() {
+      container.hidden = false;
+      isWalking = true;
+      cancelAnimationFrame(animFrameId);
+      animFrameId = requestAnimationFrame(step);
+    }
+
+    function stopWalk() {
+      isWalking = false;
+      cancelAnimationFrame(animFrameId);
+      container.hidden = true;
+      posX = -80;
+    }
+
+    // Interactive pet on click
+    char.addEventListener('click', function () {
+      if (speech) {
+        speech.innerHTML = '<span>❤️ *Purr...* Capy loves belly rubs!</span>';
+      }
+      char.style.transform = 'scale(1.3)';
+      setTimeout(function () {
+        char.style.transform = direction === -1 ? 'scaleX(-1)' : 'scaleX(1)';
+      }, 400);
+    });
+
+    // Expose globally
+    window.triggerCapyPageWalk = function () {
+      if (isWalking) {
+        stopWalk();
+      } else {
+        startWalk();
+      }
+    };
+  })();
+</script>
+

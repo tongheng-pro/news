@@ -10,23 +10,44 @@ const { articles } = Astro.props;
 
 {
   articles.length > 0 && (
-    <aside class="breaking" aria-label="Breaking news">
-      <div class="container inner">
-        <span class="badge">
-          <span class="pulse" aria-hidden="true" />
-          Breaking
-        </span>
-        <div class="ticker" tabindex="0">
+    <aside class="breaking-banner" aria-label="Breaking news">
+      <div class="container banner-inner">
+        <!-- Mascot Announcer Badge -->
+        <div class="announcer">
+          <div class="mascot-speaker-wrap" title="Capy Breaking News Desk">
+            <img 
+              class="mascot-speaker" 
+              src="/mascot-megaphone.png" 
+              alt="Mascot with megaphone" 
+              width="44" 
+              height="44" 
+            />
+          </div>
+          <div class="badge-wrap">
+            <span class="pulse-beacon" aria-hidden="true" />
+            <span class="badge-text">BREAKING</span>
+          </div>
+        </div>
+
+        <!-- Marquee Ticker -->
+        <div class="ticker" tabindex="0" aria-live="off">
           <ul>
             {articles.map((a) => (
-              <li>
-                <a href={`/news/${a.slug}`}>
-                  {a.title}
-                  <span class="ago">{timeAgo(a.publishedAt)}</span>
+              <li class="ticker-item">
+                <span class="ticker-dot">•</span>
+                <a href={`/news/${a.slug}`} class="ticker-link">
+                  <span class="ticker-category">{a.category}</span>
+                  <span class="ticker-title">{a.title}</span>
+                  <span class="ticker-time">{timeAgo(a.publishedAt)}</span>
                 </a>
               </li>
             ))}
           </ul>
+        </div>
+
+        <!-- Live Controls / Mascot Status -->
+        <div class="banner-ctrls">
+          <span class="live-tag">LIVE FEED</span>
         </div>
       </div>
     </aside>
@@ -34,85 +55,195 @@ const { articles } = Astro.props;
 }
 
 <style>
-  .breaking {
-    background: var(--text);
-    color: var(--background);
+  .breaking-banner {
+    background: linear-gradient(90deg, #030E50 0%, #081C6E 50%, #030E50 100%);
+    color: #FFFFFF;
+    border-bottom: 2px solid var(--royal);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(3, 14, 80, 0.25);
   }
-  :global(:root[data-theme='dark']) .breaking {
-    background: #1b0f12;
-    color: #fff;
+
+  .breaking-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--periwinkle), transparent);
+    opacity: 0.6;
   }
-  .inner {
+
+  .banner-inner {
     display: flex;
     align-items: center;
-    gap: 16px;
-    height: 46px;
+    gap: 18px;
+    height: 52px;
   }
-  .badge {
+
+  .announcer {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     flex-shrink: 0;
-    font-size: 0.74rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.09em;
-    color: var(--danger);
+    z-index: 2;
   }
-  .pulse {
+
+  .mascot-speaker-wrap {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2px solid var(--periwinkle);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transform: rotate(-4deg);
+    transition: transform 0.2s var(--ease);
+  }
+  .mascot-speaker-wrap:hover {
+    transform: rotate(0deg) scale(1.1);
+  }
+  .mascot-speaker {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .badge-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    background: rgba(40, 117, 251, 0.25);
+    border: 1px solid var(--periwinkle);
+  }
+
+  .badge-text {
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #FFFFFF;
+  }
+
+  .pulse-beacon {
     width: 8px;
     height: 8px;
-    border-radius: 999px;
-    background: var(--danger);
-    box-shadow: 0 0 0 0 var(--danger);
-    animation: pulse 1.8s infinite;
+    border-radius: 50%;
+    background: #2875FB;
+    box-shadow: 0 0 0 0 #2875FB;
+    animation: beacon 1.8s infinite;
   }
-  @keyframes pulse {
+
+  @keyframes beacon {
     0% {
-      box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger) 70%, transparent);
+      box-shadow: 0 0 0 0 rgba(40, 117, 251, 0.9);
+      background: #FFFFFF;
     }
     70% {
-      box-shadow: 0 0 0 8px transparent;
+      box-shadow: 0 0 0 8px rgba(40, 117, 251, 0);
+      background: #2875FB;
     }
     100% {
-      box-shadow: 0 0 0 0 transparent;
+      box-shadow: 0 0 0 0 rgba(40, 117, 251, 0);
+      background: #2875FB;
     }
   }
+
   .ticker {
     overflow: hidden;
     flex: 1;
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 24px, #000 92%, transparent);
     mask-image: linear-gradient(90deg, transparent, #000 24px, #000 92%, transparent);
   }
+
   .ticker ul {
     list-style: none;
     display: flex;
-    gap: 48px;
+    gap: 36px;
     padding: 0;
     margin: 0;
     width: max-content;
-    animation: scroll 42s linear infinite;
+    animation: scroll 46s linear infinite;
   }
+
   .ticker:hover ul,
   .ticker:focus-within ul {
     animation-play-state: paused;
   }
-  .ticker a {
+
+  .ticker-item {
     display: inline-flex;
-    align-items: baseline;
-    gap: 10px;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .ticker-dot {
+    color: var(--periwinkle);
+    font-size: 1.1rem;
+    opacity: 0.7;
+  }
+
+  .ticker-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     font-size: 0.88rem;
     font-weight: 600;
     white-space: nowrap;
+    color: #F0F5FE;
   }
-  .ticker a:hover {
-    text-decoration: underline;
+  .ticker-link:hover {
+    color: var(--periwinkle);
   }
-  .ago {
+
+  .ticker-category {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: rgba(195, 215, 252, 0.15);
+    color: var(--periwinkle);
+    border: 1px solid rgba(195, 215, 252, 0.3);
+  }
+
+  .ticker-title {
+    max-width: 500px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .ticker-time {
     font-size: 0.72rem;
     font-weight: 500;
-    opacity: 0.6;
+    color: var(--periwinkle);
+    opacity: 0.8;
   }
+
+  .banner-ctrls {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .live-tag {
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    padding: 4px 9px;
+    border-radius: 4px;
+    background: var(--capybara-brown);
+    color: #FFFFFF;
+    box-shadow: 0 2px 6px rgba(143, 93, 56, 0.4);
+  }
+
   @keyframes scroll {
     from {
       transform: translateX(0);
@@ -121,18 +252,27 @@ const { articles } = Astro.props;
       transform: translateX(-50%);
     }
   }
+
   @media (prefers-reduced-motion: reduce) {
     .ticker ul {
       animation: none;
       overflow-x: auto;
     }
   }
+
+  @media (max-width: 768px) {
+    .banner-ctrls {
+      display: none;
+    }
+    .ticker-title {
+      max-width: 260px;
+    }
+  }
 </style>
 
 <script is:inline>
-  /* Duplicate the ticker items once so the marquee loops seamlessly. */
   (function () {
-    var list = document.querySelector('.breaking .ticker ul');
+    var list = document.querySelector('.breaking-banner .ticker ul');
     if (list && !list.dataset.cloned) {
       list.innerHTML += list.innerHTML;
       list.dataset.cloned = '1';

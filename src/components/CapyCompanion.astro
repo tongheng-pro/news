@@ -1,0 +1,431 @@
+---
+/**
+ * CapyCompanion
+ * Floating interactive mascot companion featuring the waving furry capybara
+ * with direct triggers for Walk, Sniff, Cry, Yuzu Chill, and Shout actions!
+ */
+---
+
+<div class="capy-companion" id="capy-companion">
+  <!-- Interactive Popover Panel -->
+  <div class="companion-dialog" id="companion-dialog" hidden>
+    <div class="dialog-header">
+      <div class="dialog-brand">
+        <span class="dialog-avatar">🐾</span>
+        <strong>Capy Interactive Companion</strong>
+      </div>
+      <button type="button" class="dialog-close" id="dialog-close" aria-label="Close assistant">✕</button>
+    </div>
+
+    <div class="dialog-body">
+      <div class="dialog-hero">
+        <img 
+          src="/mascot-waving.png" 
+          alt="Capy waving with paw" 
+          class="dialog-mascot-img"
+          width="74" 
+          height="74"
+        />
+        <div class="dialog-speech">
+          <p class="greeting">Hey there! I'm <strong>Capy</strong>.</p>
+          <p class="subtext">Trigger cool mascot actions or listen to the daily digest!</p>
+        </div>
+      </div>
+
+      <!-- Mascot Action Buttons -->
+      <div class="companion-actions-section">
+        <div class="section-title">Trigger Mascot Actions:</div>
+        <div class="action-grid">
+          <button type="button" class="comp-act-btn" id="btn-walk-screen" title="Watch Capy walk across your screen!">
+            <span class="act-icon">🚶</span>
+            <span>Walk Page</span>
+          </button>
+          <button type="button" class="comp-act-btn" id="btn-sniff-news" title="Sniff out breaking news!">
+            <span class="act-icon">👃</span>
+            <span>Sniff News</span>
+          </button>
+          <button type="button" class="comp-act-btn" id="btn-cry-empathy" title="Shed empathy tears for world events">
+            <span class="act-icon">😢</span>
+            <span>Cry (Feels)</span>
+          </button>
+          <button type="button" class="comp-act-btn" id="btn-yuzu-chill" title="Hot spring onsen yuzu mode">
+            <span class="act-icon">🍊</span>
+            <span>Yuzu Zen</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Audio Player Simulation -->
+      <div class="audio-widget">
+        <button type="button" class="audio-play-btn" id="audio-btn" aria-label="Play audio digest">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+            <path d="M8 5v14l11-7z"/>
+          </svg>
+        </button>
+        <div class="audio-info">
+          <span class="audio-title">Capy's 3-Min Daily Brief</span>
+          <div class="audio-bar"><div class="audio-progress"></div></div>
+        </div>
+        <span class="audio-duration">03:14</span>
+      </div>
+
+      <!-- Quick Links -->
+      <div class="dialog-actions">
+        <a href="#newsletter" class="dialog-action-btn">
+          <span>📬 Newsletter</span>
+        </a>
+        <a href="/trending" class="dialog-action-btn">
+          <span>🔥 Top Ranked</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trigger Mascot Button -->
+  <button 
+    type="button" 
+    class="companion-trigger" 
+    id="companion-trigger"
+    aria-label="Toggle Capy news companion"
+    aria-expanded="false"
+  >
+    <div class="trigger-bubble">
+      <span>Capy Desk 🐾</span>
+    </div>
+    <div class="trigger-avatar-wrap">
+      <img 
+        src="/mascot-waving.png" 
+        alt="Capy waving mascot" 
+        class="trigger-mascot"
+        width="48" 
+        height="48"
+      />
+    </div>
+  </button>
+</div>
+
+<style>
+  .capy-companion {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 120;
+  }
+
+  .companion-trigger {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    padding: 0;
+    transition: transform 0.2s var(--ease);
+  }
+  .companion-trigger:hover {
+    transform: translateY(-4px) scale(1.03);
+  }
+
+  .trigger-bubble {
+    background: #030E50;
+    color: #FFFFFF;
+    font-size: 0.76rem;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--periwinkle);
+    box-shadow: 0 4px 14px rgba(3, 14, 80, 0.3);
+    white-space: nowrap;
+    animation: bounce-subtle 3s ease-in-out infinite;
+  }
+
+  @keyframes bounce-subtle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+  }
+
+  .trigger-avatar-wrap {
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 2.5px solid var(--royal);
+    box-shadow: 0 6px 20px rgba(40, 117, 251, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .trigger-mascot {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+  }
+
+  /* Popover Dialog */
+  .companion-dialog {
+    position: absolute;
+    bottom: 74px;
+    right: 0;
+    width: 340px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 16px 40px rgba(3, 14, 80, 0.25);
+    overflow: hidden;
+    animation: popin 0.22s var(--ease);
+  }
+  .companion-dialog[hidden] {
+    display: none;
+  }
+
+  @keyframes popin {
+    from {
+      transform: scale(0.9) translateY(10px);
+      opacity: 0;
+    }
+    to {
+      transform: scale(1) translateY(0);
+      opacity: 1;
+    }
+  }
+
+  .dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(90deg, #030E50, #081B6D);
+    color: #FFFFFF;
+    padding: 12px 16px;
+  }
+  .dialog-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.88rem;
+  }
+  .dialog-close {
+    color: var(--periwinkle);
+    font-size: 1rem;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .dialog-close:hover {
+    color: #FFFFFF;
+  }
+
+  .dialog-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .dialog-hero {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .dialog-mascot-img {
+    width: 66px;
+    height: 66px;
+    border-radius: 14px;
+    object-fit: cover;
+    background: var(--periwinkle-light);
+    border: 1px solid var(--periwinkle);
+    flex-shrink: 0;
+  }
+  .dialog-speech {
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+  .greeting {
+    margin-bottom: 2px;
+    color: var(--text);
+  }
+  .subtext {
+    color: var(--text-muted);
+    font-size: 0.76rem;
+  }
+
+  /* Actions Section */
+  .companion-actions-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+  }
+  .section-title {
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+  }
+  .action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .comp-act-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-xs);
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: var(--text);
+    transition: all 0.15s var(--ease);
+  }
+  .comp-act-btn:hover {
+    background: var(--periwinkle-light);
+    border-color: var(--royal);
+    color: var(--royal);
+    transform: translateY(-1px);
+  }
+  .act-icon {
+    font-size: 0.95rem;
+  }
+
+  .audio-widget {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .audio-play-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--royal);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.15s var(--ease);
+  }
+  .audio-play-btn:hover {
+    transform: scale(1.1);
+  }
+  .audio-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .audio-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .audio-bar {
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .audio-progress {
+    width: 35%;
+    height: 100%;
+    background: var(--royal);
+  }
+  .audio-duration {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-muted);
+  }
+
+  .dialog-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .dialog-action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: var(--radius-xs);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    transition: all 0.15s var(--ease);
+  }
+  .dialog-action-btn:hover {
+    background: var(--periwinkle-light);
+    border-color: var(--royal);
+    color: var(--royal);
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var trigger = document.getElementById('companion-trigger');
+    var dialog = document.getElementById('companion-dialog');
+    var closeBtn = document.getElementById('dialog-close');
+    var audioBtn = document.getElementById('audio-btn');
+
+    var btnWalk = document.getElementById('btn-walk-screen');
+    var btnSniff = document.getElementById('btn-sniff-news');
+    var btnCry = document.getElementById('btn-cry-empathy');
+    var btnYuzu = document.getElementById('btn-yuzu-chill');
+
+    if (!trigger || !dialog) return;
+
+    function toggle() {
+      var isHidden = dialog.hidden;
+      dialog.hidden = !isHidden;
+      trigger.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+    }
+
+    trigger.addEventListener('click', toggle);
+    closeBtn && closeBtn.addEventListener('click', function () {
+      dialog.hidden = true;
+      trigger.setAttribute('aria-expanded', 'false');
+    });
+
+    // Wire action triggers
+    btnWalk && btnWalk.addEventListener('click', function () {
+      if (window.triggerCapyPageWalk) {
+        window.triggerCapyPageWalk();
+      }
+      if (window.setCapyMascotAction) {
+        window.setCapyMascotAction('walk');
+      }
+    });
+
+    btnSniff && btnSniff.addEventListener('click', function () {
+      if (window.setCapyMascotAction) {
+        window.setCapyMascotAction('smell');
+      }
+    });
+
+    btnCry && btnCry.addEventListener('click', function () {
+      if (window.setCapyMascotAction) {
+        window.setCapyMascotAction('cry');
+      }
+    });
+
+    btnYuzu && btnYuzu.addEventListener('click', function () {
+      if (window.setCapyMascotAction) {
+        window.setCapyMascotAction('yuzu');
+      }
+    });
+
+    audioBtn && audioBtn.addEventListener('click', function () {
+      alert('🐾 Playing Capy\'s 3-Minute Daily Audio Digest...');
+    });
+  })();
+</script>

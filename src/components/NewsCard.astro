@@ -6,7 +6,7 @@ import NewsImage from './NewsImage.astro';
 
 export interface Props {
   article: Article;
-  /** "default" | "wide" (horizontal) | "compact" (no image) */
+  /** "default" | "wide" (horizontal) | "compact" (editorial runner) */
   variant?: 'default' | 'wide' | 'compact';
   eager?: boolean;
 }
@@ -24,138 +24,185 @@ const href = `/news/${article.slug}`;
           alt={article.title}
           seed={article.slug}
           eager={eager}
-          sizes={variant === 'wide' ? '(max-width: 620px) 100vw, 40vw' : '(max-width: 620px) 100vw, 25vw'}
+          sizes={variant === 'wide' ? '(max-width: 620px) 100vw, 38vw' : '(max-width: 620px) 100vw, 25vw'}
         />
       </a>
     )
   }
   <div class="card-body">
     <div class="card-meta">
-      <a href={`/category/${categorySlug(article.category)}`} class="card-cat">{article.category}</a>
-      <span class="dot" aria-hidden="true">·</span>
-      <time datetime={article.publishedAt}>{timeAgo(article.publishedAt)}</time>
+      <a href={`/category/${categorySlug(article.category)}`} class="card-cat">
+        {article.category}
+      </a>
+      <span class="meta-separator">•</span>
+      <time datetime={article.publishedAt} class="card-time">{timeAgo(article.publishedAt)}</time>
     </div>
+
     <h3 class="card-title">
       <a href={href}>{article.title}</a>
     </h3>
+
     {variant !== 'compact' && <p class="card-excerpt">{article.excerpt}</p>}
+
     <div class="card-foot">
       <span class="card-source">{article.source}</span>
-      <span class="dot" aria-hidden="true">·</span>
-      <span>{readingTimeLabel(article.readingTime)}</span>
+      <span class="meta-separator">•</span>
+      <span class="card-duration">{readingTimeLabel(article.readingTime)}</span>
     </div>
   </div>
 </article>
 
 <style>
   .card {
+    position: relative;
     display: flex;
     flex-direction: column;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
     overflow: hidden;
-    transition: transform 0.18s var(--ease), border-color 0.18s var(--ease),
-      box-shadow 0.18s var(--ease);
+    transition: transform 0.2s var(--ease), border-color 0.2s var(--ease),
+      box-shadow 0.2s var(--ease);
   }
+
   .card:hover {
     transform: translateY(-3px);
     border-color: var(--border-strong);
-    box-shadow: var(--shadow-md);
+    box-shadow: 0 10px 28px -6px rgba(40, 117, 251, 0.12);
   }
+
   .card:hover :global(.img-frame img) {
     transform: scale(1.05);
   }
+
   .card-media {
     display: block;
+    overflow: hidden;
   }
+  .card-media :global(.img-frame) {
+    border-radius: var(--radius) var(--radius) 0 0;
+  }
+
   .card-body {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    padding: 16px;
+    gap: 10px;
+    padding: 18px;
     flex: 1;
   }
+
   .card-meta {
     display: flex;
     align-items: center;
     gap: 6px;
     font-size: 0.74rem;
-    color: var(--text-muted);
-    font-weight: 600;
+    font-weight: 700;
   }
+
   .card-cat {
-    color: var(--accent);
+    color: var(--royal);
     text-transform: uppercase;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.06em;
+    font-size: 0.72rem;
   }
   .card-cat:hover {
-    text-decoration: underline;
+    color: var(--royal-hover);
   }
+
+  .meta-separator {
+    color: var(--border-strong);
+    font-size: 0.8rem;
+  }
+
+  .card-time {
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
   .card-title {
-    font-size: 1.02rem;
-    line-height: 1.32;
+    font-size: 1.05rem;
+    line-height: 1.35;
+    font-weight: 700;
     letter-spacing: -0.01em;
+    color: var(--text);
   }
+
   .card-title a::after {
     content: '';
     position: absolute;
     inset: 0;
   }
+
   .card-title a:hover {
-    color: var(--accent);
+    color: var(--royal);
   }
-  .card {
-    position: relative;
-  }
+
   .card-excerpt {
     font-size: 0.88rem;
+    line-height: 1.55;
     color: var(--text-muted);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
   .card-foot {
     margin-top: auto;
-    padding-top: 6px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
     display: flex;
     align-items: center;
     gap: 6px;
     font-size: 0.76rem;
     color: var(--text-muted);
   }
+
   .card-source {
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text);
   }
 
-  /* wide / horizontal */
+  .card-duration {
+    font-weight: 500;
+  }
+
+  /* Wide / Horizontal Editorial Card */
   .card--wide {
     flex-direction: row;
+    align-items: stretch;
   }
   .card--wide .card-media {
-    flex: 0 0 42%;
+    flex: 0 0 40%;
   }
   .card--wide .card-media :global(.img-frame) {
     height: 100%;
     aspect-ratio: auto;
+    border-radius: var(--radius) 0 0 var(--radius);
   }
-  @media (max-width: 620px) {
+  .card--wide .card-title {
+    font-size: 1.15rem;
+  }
+
+  @media (max-width: 640px) {
     .card--wide {
       flex-direction: column;
     }
+    .card--wide .card-media {
+      flex: none;
+    }
     .card--wide .card-media :global(.img-frame) {
       aspect-ratio: 16 / 9;
+      border-radius: var(--radius) var(--radius) 0 0;
     }
   }
 
-  /* compact / headline-only */
+  /* Compact / Editorial runner */
   .card--compact {
     border: none;
     border-radius: 0;
     background: transparent;
-    padding: 14px 0;
+    padding: 12px 0;
     border-bottom: 1px solid var(--border);
   }
   .card--compact:hover {
@@ -164,5 +211,13 @@ const href = `/news/${article.slug}`;
   }
   .card--compact .card-body {
     padding: 0;
+  }
+  .card--compact .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+  }
+  .card--compact .card-foot {
+    border-top: none;
+    padding-top: 4px;
   }
 </style>

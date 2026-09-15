@@ -6,47 +6,119 @@ import { getNews } from '../lib/news';
 const latest = await getNews(4);
 ---
 
-<Layout title="Page not found" description="The page you were looking for does not exist." noindex>
+<Layout title="Page Not Found — CapyNews" description="The story you were looking for could not be found." noindex>
   <section class="section">
-    <div class="container nf">
-      <p class="eyebrow">Error 404</p>
-      <h1>We couldn't find that page</h1>
-      <p class="lede">
-        The link may be broken or the story may have been moved. Try searching, or
-        pick up one of the latest headlines below.
-      </p>
-      <div class="nf-actions">
-        <a href="/" class="btn btn-primary">Back to home</a>
-        <a href="/search" class="btn">Search news</a>
+    <div class="container nf-wrapper">
+      <div class="nf-mascot-card">
+        <img 
+          src="/mascot-standing.png" 
+          alt="Capy looking around" 
+          class="nf-mascot-img"
+          width="130" 
+          height="130"
+        />
+        <div class="nf-speech">
+          <span>"404: No story here, but plenty of chill vibes."</span>
+        </div>
+      </div>
+
+      <div class="nf-content">
+        <div class="eyebrow">
+          <span class="pulse-indicator"></span>
+          <span>404 Lost in the Wires</span>
+        </div>
+        <h1>We couldn't find that page</h1>
+        <p class="lede">
+          The link may have changed, the dispatch moved, or Capy took a nap. 
+          Don't worry—you can explore today's top stories below or search our archive.
+        </p>
+        <div class="nf-actions">
+          <a href="/" class="btn btn-primary">
+            <span>← Back to CapyNews Home</span>
+          </a>
+          <a href="/search" class="btn btn-periwinkle">Search News</a>
+        </div>
       </div>
     </div>
   </section>
 
   <section class="section">
     <div class="container">
-      <div class="section-head"><h2>Latest news</h2></div>
+      <div class="section-head"><h2>Today's Top Headlines</h2></div>
       <NewsGrid articles={latest} columns={4} />
     </div>
   </section>
 </Layout>
 
 <style>
-  .nf {
-    max-width: 640px;
-    padding-block: 32px;
+  .nf-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    padding-block: 48px;
+    max-width: 880px;
   }
-  .nf h1 {
-    font-size: clamp(2rem, 6vw, 3.4rem);
-    margin: 10px 0 14px;
+
+  .nf-mascot-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    background: #FFFFFF;
+    border: 2px solid var(--periwinkle);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-md);
+    flex-shrink: 0;
   }
-  .nf .lede {
+
+  .nf-mascot-img {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+  }
+
+  .nf-speech {
+    background: var(--periwinkle-light);
+    color: var(--navy);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--periwinkle);
+  }
+
+  .nf-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .nf-content h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-family: var(--font-editorial);
+    line-height: 1.15;
+  }
+
+  .nf-content .lede {
     color: var(--text-muted);
-    font-size: 1.1rem;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    max-width: 48ch;
   }
+
   .nf-actions {
     display: flex;
     gap: 12px;
-    margin-top: 24px;
+    margin-top: 16px;
     flex-wrap: wrap;
+  }
+
+  @media (max-width: 768px) {
+    .nf-wrapper {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 24px;
+    }
   }
 </style>

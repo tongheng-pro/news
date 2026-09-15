@@ -7,21 +7,33 @@ export interface Props {
   title?: string;
   startAt?: number;
 }
-const { articles, title = 'Trending', startAt = 1 } = Astro.props;
+const { articles, title = 'Trending Now', startAt = 1 } = Astro.props;
 ---
 
-<section class="trending">
-  {title && <h2 class="trending-title">{title}</h2>}
-  <ol style={`--start:${startAt}`}>
+<section class="trending-panel">
+  {
+    title && (
+      <div class="panel-header">
+        <h2 class="trending-title">
+          <span class="flame-icon">🔥</span>
+          {title}
+        </h2>
+        <span class="live-pill">Real-Time</span>
+      </div>
+    )
+  }
+  <ol class="trending-list" style={`--start:${startAt}`}>
     {
       articles.map((a, i) => (
-        <li>
-          <span class="rank" aria-hidden="true">{String(startAt + i).padStart(2, '0')}</span>
+        <li class="trending-item">
+          <span class:list={['rank-num', { 'top-rank': i < 3 }]} aria-hidden="true">
+            {String(startAt + i).padStart(2, '0')}
+          </span>
           <div class="t-body">
-            <a href={`/news/${a.slug}`}>{a.title}</a>
+            <a href={`/news/${a.slug}`} class="t-title">{a.title}</a>
             <div class="t-meta">
-              <span>{a.category}</span>
-              <span class="dot" aria-hidden="true">·</span>
+              <span class="t-cat">{a.category}</span>
+              <span class="dot" aria-hidden="true">•</span>
               <time datetime={a.publishedAt}>{timeAgo(a.publishedAt)}</time>
             </div>
           </div>
@@ -32,52 +44,121 @@ const { articles, title = 'Trending', startAt = 1 } = Astro.props;
 </section>
 
 <style>
-  .trending-title {
-    font-size: 0.95rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    padding-bottom: 12px;
-    border-bottom: 2px solid var(--text);
-    margin-bottom: 4px;
+  .trending-panel {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow-sm);
   }
-  ol {
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--periwinkle);
+    margin-bottom: 12px;
+  }
+
+  .trending-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+  }
+
+  .flame-icon {
+    font-size: 1.1rem;
+  }
+
+  .live-pill {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--royal);
+    background: var(--periwinkle-light);
+    border: 1px solid var(--periwinkle);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+  }
+
+  .trending-list {
     list-style: none;
     margin: 0;
     padding: 0;
-    counter-reset: t;
   }
-  li {
+
+  .trending-item {
     display: flex;
     gap: 14px;
-    padding: 16px 0;
+    padding: 14px 0;
     border-bottom: 1px solid var(--border);
+    transition: transform 0.15s var(--ease);
   }
-  li:last-child {
+  .trending-item:last-child {
     border-bottom: none;
   }
-  .rank {
-    font-size: 1.05rem;
+  .trending-item:hover {
+    transform: translateX(4px);
+  }
+
+  .rank-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    font-size: 0.85rem;
     font-weight: 800;
-    color: var(--accent);
-    font-variant-numeric: tabular-nums;
-    line-height: 1.4;
-    min-width: 1.8ch;
+    background: var(--surface-2);
+    color: var(--text-muted);
+    flex-shrink: 0;
+    margin-top: 2px;
   }
-  .t-body a {
-    font-weight: 650;
-    font-size: 0.95rem;
-    line-height: 1.34;
-    display: block;
+
+  .rank-num.top-rank {
+    background: var(--royal);
+    color: #FFFFFF;
+    box-shadow: 0 2px 8px var(--royal-glow);
   }
-  .t-body a:hover {
-    color: var(--accent);
+
+  .t-body {
+    flex: 1;
+    min-width: 0;
   }
+
+  .t-title {
+    font-weight: 700;
+    font-size: 0.92rem;
+    line-height: 1.38;
+    color: var(--text);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .t-title:hover {
+    color: var(--royal);
+  }
+
   .t-meta {
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-top: 5px;
+    margin-top: 6px;
     font-size: 0.74rem;
     color: var(--text-muted);
+  }
+
+  .t-cat {
+    color: var(--royal);
+    font-weight: 700;
+    font-size: 0.72rem;
+    text-transform: uppercase;
   }
 </style>

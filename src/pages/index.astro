@@ -6,6 +6,8 @@ import NewsCard from '../components/NewsCard.astro';
 import TrendingList from '../components/TrendingList.astro';
 import CategorySection from '../components/CategorySection.astro';
 import Newsletter from '../components/Newsletter.astro';
+import CapySidebarWidget from '../components/CapySidebarWidget.astro';
+import CapyMascotRig from '../components/CapyMascotRig.astro';
 import {
   getBreakingNews,
   getFeaturedNews,
@@ -17,7 +19,7 @@ import {
 const [breaking, featuredList, trending] = await Promise.all([
   getBreakingNews(6),
   getFeaturedNews(4),
-  getTrendingNews(6),
+  getTrendingNews(5),
 ]);
 
 const featured = featuredList[0];
@@ -33,7 +35,6 @@ const railCategories = [
   'AI',
   'Apple',
   'Google',
-  'Microsoft',
   'Cybersecurity',
   'Programming',
   'Gaming',
@@ -49,23 +50,71 @@ const rails = await Promise.all(
 ---
 
 <Layout
-  title="TechPulse"
-  description="Global technology and world news — AI, Apple, Google, Microsoft, cybersecurity, programming, gaming, startups and the headlines shaping the wider world."
+  title="CapyNews — Modern Editorial News & Media"
+  description="Calm, high-signal global news and technology reporting featuring our 3D furry capybara mascot. Real-time updates, AI, cybersecurity, and world affairs."
   canonical="/"
 >
   <BreakingNews articles={breaking} />
 
+  <!-- Hero & Featured News Section -->
   {
     featured && (
-      <section class="section">
+      <section class="section hero-section">
         <div class="container">
-          <p class="eyebrow" style="margin-bottom:16px">Featured story</p>
+          <div class="hero-header">
+            <div class="hero-kicker">
+              <span class="pulse-indicator"></span>
+              <span class="eyebrow">Top Editorial Feature</span>
+            </div>
+            <span class="edition-tag">Global Edition</span>
+          </div>
+
           <FeaturedArticle article={featured} />
+
+          <!-- Mascot Spotlight Banner with Interactive Action Studio -->
+          <div class="mascot-spotlight-banner">
+            <div class="mascot-spotlight-inner">
+              <div class="spotlight-rig-wrap">
+                <CapyMascotRig initialAction="idle" size={200} interactive={true} />
+              </div>
+              <div class="spotlight-text">
+                <div class="spotlight-badge">
+                  <span class="paw">🐾</span>
+                  <span>CAPY ACTION STUDIO • CHILL JOURNALISM</span>
+                </div>
+                <h3>"Quality journalism doesn't have to be stressful."</h3>
+                <p>
+                  CapyNews filters out the panic and buzzword hysteria. We deliver balanced analysis, 
+                  verified facts, and deep technical clarity—all wrapped in the calmest design on the web. 
+                  Try clicking Capy's action buttons to watch him walk, sniff out breaking news, shed empathy tears, or take a yuzu bath!
+                </p>
+                <div class="spotlight-actions">
+                  <a href="#newsletter" class="btn btn-primary">
+                    <span>Get Morning Digest</span>
+                    <span>→</span>
+                  </a>
+                  <button type="button" class="btn btn-periwinkle" onclick="window.triggerCapyPageWalk && window.triggerCapyPageWalk()">
+                    <span>🚶 Walk Across Screen</span>
+                  </button>
+                  <a href="/trending" class="btn btn-brown">
+                    <span>🔥 Trending Leaderboard</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {featuredRunnersUp.length > 0 && (
-            <div class="runners">
-              {featuredRunnersUp.map((a) => (
-                <NewsCard article={a} variant="compact" />
-              ))}
+            <div class="runners-block">
+              <div class="runners-header">
+                <h3>Editors' Fast Takes</h3>
+                <span>3 Stories Worth Your Coffee Break</span>
+              </div>
+              <div class="runners-grid">
+                {featuredRunnersUp.map((a) => (
+                  <NewsCard article={a} variant="default" />
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -73,66 +122,253 @@ const rails = await Promise.all(
     )
   }
 
-  <section class="section">
-    <div class="container split">
-      <div>
+  <!-- Latest News & Sticky Sidebar Section -->
+  <section class="section main-feed-section">
+    <div class="container split-layout">
+      <!-- Main Articles Column -->
+      <div class="feed-column">
         <div class="section-head">
-          <h2>Latest news</h2>
-          <a href="/trending">All stories →</a>
+          <h2>
+            <span class="section-icon">📰</span>
+            Latest Headlines
+          </h2>
+          <a href="/trending">Browse full wire →</a>
         </div>
-        <div class="latest-list">
+        <div class="latest-feed">
           {latest.map((a) => <NewsCard article={a} variant="wide" />)}
         </div>
       </div>
-      <aside class="sidebar">
-        <TrendingList articles={trending} title="Trending now" />
-        <a href="/trending" class="btn" style="width:100%;margin-top:16px">See the full ranking</a>
+
+      <!-- Editorial Sidebar -->
+      <aside class="sidebar-column">
+        <div class="sticky-sidebar">
+          <!-- Mascot Weather & Mood Desk -->
+          <CapySidebarWidget />
+
+          <!-- Real-Time Trending Leaderboard -->
+          <TrendingList articles={trending} title="Most Read Today" />
+
+          <a href="/trending" class="btn btn-primary full-btn">
+            <span>View All Top Rankings</span>
+            <span>→</span>
+          </a>
+        </div>
       </aside>
     </div>
   </section>
 
-  {rails.map((rail) => <CategorySection category={rail.name} articles={rail.articles} columns={4} />)}
+  <!-- Curated Category Rails -->
+  {rails.map((rail) => (
+    <CategorySection category={rail.name} articles={rail.articles} columns={4} />
+  ))}
 
+  <!-- Newsletter Signup Block -->
   <Newsletter />
 </Layout>
 
 <style>
-  .runners {
+  .hero-section {
+    padding-top: clamp(24px, 3.5vw, 40px);
+  }
+
+  .hero-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .hero-kicker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .edition-tag {
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* Mascot Spotlight Banner */
+  .mascot-spotlight-banner {
+    margin-top: 32px;
+    background: linear-gradient(135deg, #030E50 0%, #071960 50%, #0C2B88 100%);
+    border-radius: var(--radius-lg);
+    border: 1.5px solid var(--periwinkle);
+    box-shadow: var(--shadow-mascot);
+    color: #FFFFFF;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .mascot-spotlight-banner::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 6px;
+    background: var(--royal);
+  }
+
+  .mascot-spotlight-inner {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: clamp(20px, 3vw, 28px) clamp(24px, 4vw, 36px);
+  }
+
+  .spotlight-rig-wrap {
+    background: rgba(255, 255, 255, 0.07);
+    backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(195, 215, 252, 0.35);
+    border-radius: var(--radius-lg);
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.3);
+  }
+
+  .spotlight-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .spotlight-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: var(--periwinkle);
+  }
+
+  .spotlight-text h3 {
+    font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+    font-weight: 800;
+    color: #FFFFFF;
+    line-height: 1.25;
+  }
+
+  .spotlight-text p {
+    font-size: 0.88rem;
+    line-height: 1.55;
+    color: var(--periwinkle);
+    max-width: 64ch;
+    opacity: 0.92;
+  }
+
+  .spotlight-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 960px) {
+    .mascot-spotlight-inner {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 18px;
+    }
+    .spotlight-actions {
+      flex-direction: row;
+      width: 100%;
+    }
+    .spotlight-actions .btn {
+      flex: 1;
+    }
+  }
+
+  /* Runners Block */
+  .runners-block {
+    margin-top: 36px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border-strong);
+  }
+
+  .runners-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .runners-header h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .runners-header span {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  .runners-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 24px;
-    margin-top: 28px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
   }
-  .runners :global(.card--compact) {
-    border-bottom: none;
-    padding: 0;
-  }
-  .split {
+
+  /* Main Feed & Sidebar Split */
+  .split-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 340px;
-    gap: clamp(28px, 5vw, 60px);
+    grid-template-columns: minmax(0, 1fr) 360px;
+    gap: clamp(28px, 4.5vw, 54px);
     align-items: start;
   }
-  .latest-list {
+
+  .feed-column {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .latest-feed {
     display: grid;
     gap: 20px;
   }
-  .sidebar {
-    position: sticky;
-    top: calc(var(--header-height) + 20px);
+
+  .sidebar-column {
+    position: relative;
   }
-  @media (max-width: 980px) {
-    .split {
+
+  .sticky-sidebar {
+    position: sticky;
+    top: calc(var(--header-height) + 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .full-btn {
+    width: 100%;
+    justify-content: space-between;
+    padding-inline: 20px;
+  }
+
+  .section-icon {
+    font-size: 1.25rem;
+  }
+
+  @media (max-width: 1024px) {
+    .split-layout {
       grid-template-columns: 1fr;
     }
-    .sidebar {
+    .sticky-sidebar {
       position: static;
     }
-    .runners {
+    .runners-grid {
       grid-template-columns: 1fr;
-      gap: 14px;
+      gap: 16px;
     }
   }
 </style>

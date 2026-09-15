@@ -1,0 +1,436 @@
+---
+/**
+ * CapySidebarWidget
+ * Featuring Capy's Daily Desk, Weather & Mood, and the Official Mascot Color Swatches
+ * Featuring Capy's Daily Desk, Weather & Mood, Mascot Action Triggers, and Color Swatches
+ */
+---
+
+<div class="capy-desk-card">
+  <!-- Header with Mascot Standing -->
+  <div class="desk-head">
+    <div class="mascot-img-wrap" id="sidebar-mascot-avatar" title="Click Capy for a surprise!">
+      <img 
+        src="/mascot-standing.png" 
+        alt="Capy mascot standing" 
+        class="mascot-mini"
+        id="sidebar-mascot-img"
+        width="68" 
+        height="68"
+      />
+    </div>
+    <div class="desk-title-wrap">
+      <div class="mascot-badge">
+        <span class="pulse-indicator"></span>
+        <span>EDITOR'S DESK</span>
+      </div>
+      <h3 class="desk-name">Capy's Daily Vibe</h3>
+      <p class="desk-status">"Keep calm and read the source."</p>
+      <p class="desk-status" id="sidebar-vibe-quote">"Keep calm and read the source."</p>
+    </div>
+  </div>
+
+  <!-- Mascot Action Quick Controller -->
+  <div class="action-interactive-box">
+    <div class="box-title">
+      <span>Play Mascot Animations:</span>
+      <span class="live-dot">● Interactive</span>
+    </div>
+    <div class="action-chips">
+      <button type="button" class="action-chip" data-action="walk" title="Capy walks across the screen!">
+        <span>🚶 Walk</span>
+      </button>
+      <button type="button" class="action-chip" data-action="smell" title="Sniff the news scoops!">
+        <span>👃 Sniff</span>
+      </button>
+      <button type="button" class="action-chip" data-action="cry" title="Emotional tears for world news">
+        <span>😢 Cry</span>
+      </button>
+      <button type="button" class="action-chip" data-action="yuzu" title="Onsen hot spring chill with yuzu">
+        <span>🍊 Yuzu</span>
+      </button>
+      <button type="button" class="action-chip" data-action="shout" title="Megaphone breaking alert">
+        <span>📣 Shout</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mood & Stats -->
+  <div class="desk-stats">
+    <div class="stat-box">
+      <span class="stat-label">Atmosphere</span>
+      <span class="stat-val">☀️ 22°C Clear</span>
+    </div>
+    <div class="stat-box">
+      <span class="stat-label">Chill Meter</span>
+      <span class="stat-val">🐾 98% Optimal</span>
+    </div>
+  </div>
+
+  <!-- Color Palette Showcase (Dribbble/Behance style) -->
+  <div class="palette-showcase">
+    <div class="palette-header">
+      <span class="palette-title">Mascot Brand Palette</span>
+      <span class="palette-tag">Official</span>
+    </div>
+    <div class="swatches-row">
+      <div class="swatch" style="background:#C3D7FC;" title="Soft Periwinkle Blue (#C3D7FC)">
+        <span class="swatch-code">#C3D7FC</span>
+      </div>
+      <div class="swatch" style="background:#2875FB;" title="Vibrant Royal Blue (#2875FB)">
+        <span class="swatch-code" style="color:#fff;">#2875FB</span>
+      </div>
+      <div class="swatch" style="background:#8F5D38;" title="Warm Capybara Brown (#8F5D38)">
+        <span class="swatch-code" style="color:#fff;">#8F5D38</span>
+      </div>
+      <div class="swatch" style="background:#030E50;" title="Deep Navy (#030E50)">
+        <span class="swatch-code" style="color:#fff;">#030E50</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Quick Poll -->
+  <div class="poll-widget" id="capy-poll">
+    <div class="poll-title">Daily Question: Next Big Leap?</div>
+    <div class="poll-options">
+      <button type="button" class="poll-btn" data-votes="72">
+        <span class="btn-text">Autonomous AI Agents</span>
+        <span class="pct">72%</span>
+      </button>
+      <button type="button" class="poll-btn" data-votes="19">
+        <span class="btn-text">Quantum Supremacy</span>
+        <span class="pct">19%</span>
+      </button>
+      <button type="button" class="poll-btn" data-votes="9">
+        <span class="btn-text">Brain-Computer Link</span>
+        <span class="pct">9%</span>
+      </button>
+    </div>
+    <p class="poll-foot">🐾 2,841 readers voted today</p>
+  </div>
+</div>
+
+<style>
+  .capy-desk-card {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .capy-desk-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #C3D7FC, #2875FB, #8F5D38, #030E50);
+  }
+
+  .desk-head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .mascot-img-wrap {
+    width: 68px;
+    height: 68px;
+    border-radius: 18px;
+    background: var(--periwinkle-light);
+    border: 1.5px solid var(--periwinkle);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px var(--royal-glow);
+    cursor: pointer;
+    transition: transform 0.2s var(--ease);
+  }
+  .mascot-img-wrap:hover {
+    transform: scale(1.1) rotate(-3deg);
+  }
+
+  .mascot-mini {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+  }
+
+  .desk-title-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .mascot-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--royal);
+    text-transform: uppercase;
+  }
+
+  .desk-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  .desk-status {
+    font-size: 0.78rem;
+    font-style: italic;
+    color: var(--text-muted);
+  }
+
+  /* Action Interactive Box */
+  .action-interactive-box {
+    background: var(--surface-2);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .box-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+  }
+
+  .live-dot {
+    color: var(--royal);
+    font-weight: 700;
+  }
+
+  .action-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .action-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--border-strong);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.74rem;
+    font-weight: 700;
+    transition: all 0.15s var(--ease);
+  }
+  .action-chip:hover {
+    background: var(--royal);
+    color: #FFFFFF;
+    border-color: var(--royal);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px var(--royal-glow);
+  }
+
+  .desk-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .stat-box {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat-label {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+
+  .stat-val {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  /* Palette Swatches */
+  .palette-showcase {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .palette-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .palette-title {
+    font-size: 0.72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+
+  .palette-tag {
+    font-size: 0.64rem;
+    font-weight: 800;
+    background: var(--royal);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+
+  .swatches-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .swatch {
+    height: 38px;
+    border-radius: 6px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: 2px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    transition: transform 0.15s var(--ease);
+    cursor: pointer;
+  }
+  .swatch:hover {
+    transform: scale(1.08);
+  }
+
+  .swatch-code {
+    font-size: 0.55rem;
+    font-weight: 800;
+    color: #030E50;
+    letter-spacing: -0.02em;
+  }
+
+  /* Quick Poll */
+  .poll-widget {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .poll-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .poll-options {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .poll-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-xs);
+    background: var(--surface);
+    color: var(--text);
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.18s var(--ease);
+  }
+  .poll-btn:hover {
+    background: var(--periwinkle-light);
+    border-color: var(--royal);
+    color: var(--royal);
+  }
+
+  .pct {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: var(--royal);
+  }
+
+  .poll-foot {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    margin: 0;
+    text-align: right;
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var chips = document.querySelectorAll('.action-chip');
+    var quote = document.getElementById('sidebar-vibe-quote');
+    var avatarWrap = document.getElementById('sidebar-mascot-avatar');
+
+    var quotes = {
+      walk: '🚶 "Capy is on patrol across the screen!"',
+      smell: '👃 "*Sniff sniff* Smells like fresh tech scoops!"',
+      cry: '😢 "Capy sheds a tear for difficult news..."',
+      yuzu: '🍊 "Onsen bliss. 100% stress-free reading."',
+      shout: '📣 "Breaking alert! Verified facts incoming!"'
+    };
+
+    chips.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var action = btn.getAttribute('data-action');
+        if (quote && quotes[action]) {
+          quote.textContent = quotes[action];
+        }
+
+        if (action === 'walk' && window.triggerCapyPageWalk) {
+          window.triggerCapyPageWalk();
+        }
+
+        if (window.setCapyMascotAction) {
+          window.setCapyMascotAction(action);
+        }
+      });
+    });
+
+    avatarWrap && avatarWrap.addEventListener('click', function () {
+      if (window.triggerCapyPageWalk) {
+        window.triggerCapyPageWalk();
+      }
+    });
+  })();
+</script>

@@ -11,7 +11,7 @@ const { article } = Astro.props;
 const href = `/news/${article.slug}`;
 ---
 
-<article class="featured">
+<article class="featured-card">
   <a href={href} class="featured-media" tabindex="-1" aria-hidden="true">
     <NewsImage
       src={article.image}
@@ -20,99 +20,228 @@ const href = `/news/${article.slug}`;
       eager
       sizes="(max-width: 900px) 100vw, 60vw"
     />
+    <div class="media-overlay">
+      <span class="editorial-badge">
+        <span class="badge-paw">🐾</span>
+        CAPY'S LEAD STORY
+      </span>
+    </div>
   </a>
+
   <div class="featured-body">
     <div class="featured-meta">
-      <a href={`/category/${categorySlug(article.category)}`} class="eyebrow">{article.category}</a>
+      <a href={`/category/${categorySlug(article.category)}`} class="category-tag">
+        {article.category}
+      </a>
+      <span class="chill-rating" title="Calm, high-signal reporting">
+        <span class="paw-icon">🐾</span> Chill Factor: <strong>9/10</strong>
+      </span>
     </div>
+
     <h2 class="featured-title">
       <a href={href}>{article.title}</a>
     </h2>
+
     <p class="featured-excerpt">{article.excerpt}</p>
+
+    <!-- Editorial Author Byline & Mascot Fact-Check Tag -->
     <div class="featured-foot">
-      <span>
-        {article.author.trim().toLowerCase() === article.source.trim().toLowerCase()
-          ? article.source
-          : `By ${article.author}, ${article.source}`}
-      </span>
-      <span class="dot" aria-hidden="true">·</span>
-      <time datetime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
-      <span class="dot" aria-hidden="true">·</span>
-      <span>{readingTimeLabel(article.readingTime)}</span>
+      <div class="byline-info">
+        <span class="author-label">
+          {article.author.trim().toLowerCase() === article.source.trim().toLowerCase()
+            ? article.source
+            : `By ${article.author}`}
+        </span>
+        <span class="dot" aria-hidden="true">•</span>
+        <time datetime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
+        <span class="dot" aria-hidden="true">•</span>
+        <span class="read-duration">{readingTimeLabel(article.readingTime)}</span>
+      </div>
+
+      <div class="mascot-verified" title="Reviewed for accuracy & balanced reporting">
+        <svg viewBox="0 0 20 20" width="14" height="14" fill="#2875FB">
+          <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm3.707 6.707l-4.5 4.5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L8.5 11.086l3.793-3.793a1 1 0 011.414 1.414z"/>
+        </svg>
+        <span>Verified Editorial</span>
+      </div>
     </div>
   </div>
 </article>
 
 <style>
-  .featured {
+  .featured-card {
     position: relative;
     display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    gap: clamp(20px, 3vw, 40px);
+    grid-template-columns: 1.4fr 1fr;
+    gap: clamp(24px, 3.5vw, 44px);
     align-items: center;
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 1px solid var(--border-strong);
     border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
     overflow: hidden;
+    transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
   }
+
+  .featured-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--royal);
+    box-shadow: var(--shadow-mascot);
+  }
+
   .featured-media {
+    position: relative;
     display: block;
-    /* Without this, the grid item's default auto min-width lets the image
-       frame's intrinsic size push it past its 1.5fr track and crush the
-       text column next to it. */
     min-width: 0;
   }
+
   .featured-media :global(.img-frame) {
-    /* Width is pinned to the column; height is left to `aspect-ratio` below
-       so the frame's shape always stays 16:10 — NOT `align-self: stretch` +
-       `height: 100%`, which used to make the row's own height (driven by
-       whatever the headline needs) dictate the image's height instead,
-       stretching it tall and out of proportion behind long titles. */
     width: 100%;
     aspect-ratio: 16 / 10;
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
   }
-  .featured:hover :global(.img-frame img) {
-    transform: scale(1.04);
+
+  .media-overlay {
+    position: absolute;
+    top: 18px;
+    left: 18px;
+    z-index: 2;
   }
+
+  .editorial-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    background: rgba(3, 14, 80, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--periwinkle);
+    color: #FFFFFF;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .badge-paw {
+    font-size: 0.85rem;
+  }
+
   .featured-body {
-    padding: clamp(20px, 3vw, 40px);
+    padding: clamp(24px, 3vw, 40px);
     padding-left: 0;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
   }
+
+  .featured-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .category-tag {
+    display: inline-block;
+    padding: 5px 14px;
+    border-radius: var(--radius-full);
+    background: var(--royal);
+    color: #FFFFFF;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    transition: opacity 0.15s var(--ease);
+  }
+  .category-tag:hover {
+    opacity: 0.9;
+  }
+
+  .chill-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--capybara-brown);
+    background: rgba(143, 93, 56, 0.1);
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(143, 93, 56, 0.25);
+  }
+
   .featured-title {
-    font-size: clamp(1.6rem, 3.4vw, 2.6rem);
-    line-height: 1.12;
+    font-family: var(--font-editorial);
+    font-size: clamp(1.85rem, 3.2vw, 2.75rem);
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
   }
   .featured-title a:hover {
-    color: var(--accent);
+    color: var(--royal);
   }
   .featured-title a::after {
     content: '';
     position: absolute;
     inset: 0;
   }
+
   .featured-excerpt {
-    font-size: clamp(1rem, 1.6vw, 1.15rem);
+    font-size: clamp(0.98rem, 1.4vw, 1.12rem);
+    line-height: 1.6;
     color: var(--text-muted);
-    max-width: 52ch;
+    max-width: 54ch;
   }
+
   .featured-foot {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     flex-wrap: wrap;
-    gap: 8px;
-    font-size: 0.82rem;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 0.84rem;
     color: var(--text-muted);
   }
-  @media (max-width: 900px) {
-    .featured {
+
+  .byline-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .author-label {
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .mascot-verified {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--royal);
+    background: var(--periwinkle-light);
+    padding: 3px 9px;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--periwinkle);
+  }
+
+  @media (max-width: 960px) {
+    .featured-card {
       grid-template-columns: 1fr;
     }
+    .featured-media :global(.img-frame) {
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
     .featured-body {
-      padding: clamp(18px, 5vw, 28px);
-      padding-top: 0;
+      padding: clamp(20px, 4vw, 32px);
     }
   }
 </style>
